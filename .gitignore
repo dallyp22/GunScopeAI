@@ -1,0 +1,28 @@
+node_modules
+dist
+.DS_Store
+server/public
+vite.config.ts.*
+*.tar.gz
+
+# Environment variables (NEVER commit these!)
+.env
+.env.local
+.env.*.local
+
+# Local config and cache
+.config/
+.local/
+.cache/
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+logs/
+
+# OS
+Thumbs.db/api/index.js
