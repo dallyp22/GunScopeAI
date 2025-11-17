@@ -1,8 +1,28 @@
 import "dotenv/config";
 import express, { type Request, Response, NextFunction } from "express";
+
+// Global error handlers FIRST
+process.on('uncaughtException', (error) => {
+  console.error('💥 UNCAUGHT EXCEPTION:', error);
+  console.error(error.stack);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('💥 UNHANDLED REJECTION:', reason);
+  process.exit(1);
+});
+
+console.log('🚀 GunScope AI initializing...');
+console.log('📍 Working directory:', process.cwd());
+console.log('📦 Node version:', process.version);
+console.log('🔧 Environment:', process.env.NODE_ENV);
+
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { cleanupOpenAI } from "./services/openai";
+
+console.log('✅ All imports loaded successfully');
 
 const app = express();
 
