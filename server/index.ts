@@ -75,7 +75,14 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  console.log('🚀 Starting GunScope AI server...');
+  console.log('📊 Environment:', process.env.NODE_ENV);
+  console.log('🔌 Database URL configured:', !!process.env.DATABASE_URL);
+  console.log('🤖 OpenAI key configured:', !!process.env.OPENAI_API_KEY);
+  console.log('🔥 Firecrawl key configured:', !!process.env.FIRECRAWL_API_KEY);
+  
   const server = await registerRoutes(app);
+  console.log('✅ Routes registered');
 
   app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
@@ -129,4 +136,7 @@ app.use((req, res, next) => {
     await cleanupOpenAI();
     process.exit(0);
   });
-})();
+})().catch((error) => {
+  console.error('❌ Fatal server startup error:', error);
+  process.exit(1);
+});

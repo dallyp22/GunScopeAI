@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import type { ScraperStats } from './auctionScraper.js';
+import type { ScraperStats } from './firearmScraper.js';
 
 /**
  * Scraper Diagnostics Service
@@ -16,10 +16,15 @@ const LOGS_DIR = path.join(process.cwd(), 'logs');
 const DIAGNOSTICS_LOG = path.join(LOGS_DIR, 'scraper-diagnostics.jsonl');
 const MISSING_AUCTIONS_LOG = path.join(LOGS_DIR, 'missing-auctions.jsonl');
 
-// Ensure logs directory exists
+// Ensure logs directory exists (safe for read-only filesystems)
 function ensureLogsDir() {
-  if (!fs.existsSync(LOGS_DIR)) {
-    fs.mkdirSync(LOGS_DIR, { recursive: true });
+  try {
+    if (!fs.existsSync(LOGS_DIR)) {
+      fs.mkdirSync(LOGS_DIR, { recursive: true });
+    }
+  } catch (error) {
+    // Silently fail if filesystem is read-only (e.g., Railway)
+    console.warn('Could not create logs directory (filesystem may be read-only):', error instanceof Error ? error.message : error);
   }
 }
 
@@ -53,9 +58,15 @@ export class ScraperDiagnosticsService {
   logStats(stats: ScraperStats[]): void {
     ensureLogsDir();
     
-    for (const stat of stats) {
-      const logLine = JSON.stringify(stat) + '\n';
-      fs.appendFileSync(DIAGNOSTICS_LOG, logLine);
+    try {
+      for (const stat of stats) {
+        const logLine = JSON.stringify(stat) + '\n';
+        fs.appendFileSync(DIAGNOSTICS_LOG, logLine);
+      }
+    } catch (error) {
+      // Fail gracefully on read-only filesystem
+      console.log('📊 Scraper stats (logging to console - filesystem unavailable)');
+      stats.forEach(s => console.log(`  ${s.sourceName}: ${s.successfulSaves}/${s.discoveredUrls}`));
     }
   }
 
@@ -65,22 +76,28 @@ export class ScraperDiagnosticsService {
   logMissingAuctions(stats: ScraperStats[]): void {
     ensureLogsDir();
     
-    for (const stat of stats) {
-      // Log URLs that weren't processed (not_processed)
-      for (const url of stat.missingUrls) {
-        const isIowa = this.isIowaUrl(url);
-        const missing: MissingAuction = {
-          timestamp: new Date().toISOString(),
-          source: stat.sourceName,
-          url,
-          reason: 'not_processed',
-          is_iowa: isIowa,
-          discovered_in_scrape_id: stat.scrapeId
-        };
-        
-        const logLine = JSON.stringify(missing) + '\n';
-        fs.appendFileSync(MISSING_AUCTIONS_LOG, logLine);
+    try {
+      for (const stat of stats) {
+        // Log URLs that weren't processed (not_processed)
+        for (const url of stat.missingUrls) {
+          const isIowa = this.isIowaUrl(url);
+          const missing: MissingAuction = {
+            timestamp: new Date().toISOString(),
+            source: stat.sourceName,
+            url,
+            reason: 'not_processed',
+            is_iowa: isIowa,
+            discovered_in_scrape_id: stat.scrapeId
+          };
+          
+          const logLine = JSON.stringify(missing) + '\n';
+          fs.appendFileSync(MISSING_AUCTIONS_LOG, logLine);
+        }
       }
+    } catch (error) {
+      // Fail gracefully on read-only filesystem
+      const totalMissing = stats.reduce((sum, s) => sum + s.missingUrls.length, 0);
+      console.log(`⚠️  ${totalMissing} missing URLs (filesystem unavailable for detailed logging)`);
     }
   }
 
