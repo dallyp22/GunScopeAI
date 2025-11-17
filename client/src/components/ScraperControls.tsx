@@ -135,7 +135,10 @@ export function ScraperControls() {
             SCRAPING...
           </span>
         ) : (
-          '🔫 RUN SCRAPER'
+          <span className="flex items-center justify-center gap-2">
+            <img src="/gunscope-logo.png" alt="" className="h-4 w-4" />
+            RUN SCRAPER
+          </span>
         )}
       </button>
 

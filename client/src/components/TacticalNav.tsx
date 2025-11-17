@@ -9,7 +9,12 @@ export function TacticalNav() {
     <div className="h-14 border-b border-[#00ff4133] bg-[#1a1f1d] scanlines flex items-center justify-between px-6">
       {/* Logo/Title */}
       <div className="flex items-center gap-3">
-        <div className="text-2xl">🔫</div>
+        <img 
+          src="/gunscope-logo.png" 
+          alt="GunScope AI" 
+          className="h-10 w-10 object-contain"
+          style={{ filter: 'drop-shadow(0 0 8px rgba(0, 255, 65, 0.6))' }}
+        />
         <div>
           <h1 className="hud-text-bright text-lg font-bold uppercase tracking-wider">
             GunScope AI
