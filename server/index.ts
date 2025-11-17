@@ -3,15 +3,13 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { cleanupOpenAI } from "./services/openai";
-import { AuctionArchiverService } from "./services/auctionArchiver";
-import { automaticScraperService } from "./services/automaticScraper";
 
 const app = express();
 
 // CORS middleware - allow Vercel frontend to access Railway backend
 app.use((req, res, next) => {
   const allowedOrigins = [
-    'https://terra-value-prod.vercel.app',
+    'https://gun-scope-ai.vercel.app',
     'http://localhost:5001',
     'http://localhost:5173'
   ];
@@ -116,29 +114,18 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   const port = process.env.PORT ? parseInt(process.env.PORT) : 5001;
   server.listen(port, "0.0.0.0", () => {
-    log(`serving on port ${port}`);
+    log(`🔫 GunScope AI serving on port ${port}`);
   });
-
-  // Start auction archiver service (runs daily to clean up past auctions)
-  const archiverService = new AuctionArchiverService();
-  archiverService.start();
-
-  // Start automatic scraper service (runs on schedule if enabled)
-  automaticScraperService.start();
 
   // Graceful shutdown handling
   process.on('SIGTERM', async () => {
     console.log('SIGTERM received, cleaning up...');
-    automaticScraperService.stop();
-    archiverService.stop();
     await cleanupOpenAI();
     process.exit(0);
   });
 
   process.on('SIGINT', async () => {
     console.log('SIGINT received, cleaning up...');
-    automaticScraperService.stop();
-    archiverService.stop();
     await cleanupOpenAI();
     process.exit(0);
   });
