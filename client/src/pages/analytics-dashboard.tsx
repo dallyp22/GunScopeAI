@@ -15,11 +15,11 @@ export default function AnalyticsDashboard() {
       {/* Metrics Cards */}
       <MetricsDashboard />
       
-      {/* Main Content Grid - 40% / 35% / 25% */}
-      <div className="flex-1 grid grid-cols-12 gap-4 p-4 overflow-hidden">
+      {/* Main Content Grid - More balanced spacing */}
+      <div className="flex-1 grid grid-cols-12 gap-6 p-6 overflow-hidden">
         
-        {/* Left Column (40%) - Live Feed & Scraper */}
-        <div className="col-span-5 flex flex-col gap-4 overflow-auto modern-scrollbar">
+        {/* Left Column (33%) - Live Feed & Scraper */}
+        <div className="col-span-4 flex flex-col gap-6 overflow-auto modern-scrollbar">
           <ScraperControls />
           <div className="flex-1 overflow-hidden">
             <LiveAuctionFeed />
@@ -27,13 +27,13 @@ export default function AnalyticsDashboard() {
           <OpportunitiesPanel />
         </div>
         
-        {/* Center Column (35%) - Price Chart */}
-        <div className="col-span-4">
+        {/* Center Column (33%) - Price Chart */}
+        <div className="col-span-4 flex flex-col gap-6">
           <PriceCharts />
         </div>
         
-        {/* Right Column (25%) - Competitor Intel */}
-        <div className="col-span-3">
+        {/* Right Column (33%) - Competitor Intel */}
+        <div className="col-span-4 flex flex-col gap-6">
           <CompetitorIntel />
         </div>
       </div>
