@@ -63,7 +63,7 @@ export class FirearmScraperService {
     isActive: false,
     currentSource: '',
     completedSources: 0,
-    totalSources: 35,
+    totalSources: 46, // 35 estate + 11 competitor
     currentSourceProgress: 0
   };
 
@@ -108,7 +108,22 @@ export class FirearmScraperService {
     { name: 'Bonnette Auctions', state: 'LA', city: 'Alexandria', url: 'https://bonnetteauctions.com/', category: 'estate' },
     { name: 'Lawler Auction Company', state: 'LA', city: 'Shreveport', url: 'https://www.lawlerauction.com/', category: 'estate' },
     { name: 'Henderson Auctions', state: 'LA', city: 'Baton Rouge / Livingston', url: 'https://www.hendersonauctions.com/', category: 'estate' },
-    { name: 'Stokes & Hubbell Auctioneers', state: 'LA', city: 'Lafayette / Acadiana', url: 'https://www.stokesandhubbell.com/', category: 'estate' }
+    { name: 'Stokes & Hubbell Auctioneers', state: 'LA', city: 'Lafayette / Acadiana', url: 'https://www.stokesandhubbell.com/', category: 'estate' },
+    
+    // ============================================================
+    // COMPETITOR AUCTION HOUSES - Major Firearms Marketplaces
+    // ============================================================
+    { name: 'GunBroker.com', state: 'National', city: 'Online', url: 'https://www.gunbroker.com/', category: 'competitor' },
+    { name: 'GunAuction.com', state: 'National', city: 'Online', url: 'https://www.gunauction.com/', category: 'competitor' },
+    { name: 'GunsAmerica.com', state: 'National', city: 'Online', url: 'https://gunsamerica.com/', category: 'competitor' },
+    { name: 'GunSpot.com', state: 'National', city: 'Online', url: 'https://gunspot.com/', category: 'competitor' },
+    { name: 'Morphy Auctions', state: 'PA', city: 'Denver', url: 'https://morphyauctions.com/auctions/', category: 'competitor' },
+    { name: 'Summit Gun Auctions', state: 'National', city: 'Online', url: 'https://www.summitgunauctions.com/', category: 'competitor' },
+    { name: 'FirearmLand', state: 'National', city: 'Online', url: 'https://firearmland.com/', category: 'competitor' },
+    { name: 'Gun Runner Auctions', state: 'National', city: 'Online', url: 'https://www.gunrunnerauctions.com/', category: 'competitor' },
+    { name: 'SSL Firearms', state: 'National', city: 'Online', url: 'https://www.sslfirearms.com/', category: 'competitor' },
+    { name: 'CT Firearms Auctions', state: 'CT', city: 'Connecticut', url: 'https://ctfirearmsauction.com/', category: 'competitor' },
+    { name: 'Civilian Marksmanship Program (CMP)', state: 'National', city: 'Online', url: 'https://thecmp.org/cmp_sales/guns-on-auction/', category: 'competitor' }
   ];
 
   // Get stats from last scrape

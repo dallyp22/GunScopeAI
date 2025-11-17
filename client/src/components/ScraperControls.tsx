@@ -186,7 +186,7 @@ export function ScraperControls() {
         </div>
         <div className="flex justify-between border-b border-[#00ff4133] pb-1">
           <span className="text-[#00ff4166]">Sources:</span>
-          <span className="text-[#00ff41]">{sourceCategory === 'estate' ? '35' : '0'}</span>
+          <span className="text-[#00ff41]">{sourceCategory === 'estate' ? '35' : '11'}</span>
         </div>
         <div className="flex justify-between border-b border-[#00ff4133] pb-1">
           <span className="text-[#00ff4166]">Last Scrape:</span>
@@ -200,11 +200,14 @@ export function ScraperControls() {
         </div>
       </div>
       
-      {/* Add Competitor Note */}
+      {/* Category Info */}
       {sourceCategory === 'competitor' && (
-        <div className="mt-3 p-2 border border-[#ffb00033] bg-[#252a28]">
-          <div className="text-[10px] text-[#ffb000] font-mono">
-            No competitor sources configured yet. Add them in Sources view.
+        <div className="mt-3 p-2 border border-[#00ff4133] bg-[#252a28]">
+          <div className="text-[10px] text-[#00ff41] font-mono">
+            ✅ 11 major firearms marketplaces configured
+          </div>
+          <div className="text-[9px] text-[#00ff4166] font-mono mt-1">
+            GunBroker, Morphy, GunsAmerica, CMP +8 more
           </div>
         </div>
       )}
