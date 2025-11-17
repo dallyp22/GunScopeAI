@@ -15,26 +15,41 @@ export default function AnalyticsDashboard() {
       {/* Metrics Cards */}
       <MetricsDashboard />
       
-      {/* Main Content Grid - More balanced spacing */}
+      {/* Main Content Grid - Optimized Information Hierarchy: 25% / 50% / 25% */}
       <div className="flex-1 grid grid-cols-12 gap-6 p-6 overflow-hidden">
         
-        {/* Left Column (33%) - Live Feed & Scraper */}
-        <div className="col-span-4 flex flex-col gap-6 overflow-auto modern-scrollbar">
-          <ScraperControls />
+        {/* Left Column (25%) - Monitoring & Alerts */}
+        <div className="col-span-3 flex flex-col gap-6">
+          {/* HIGH PRIORITY TARGETS - Top position for immediate action */}
+          <div className="flex-1">
+            <OpportunitiesPanel />
+          </div>
+          
+          {/* SCRAPER CONTROLS - Secondary importance, bottom position */}
+          <div>
+            <ScraperControls />
+          </div>
+        </div>
+        
+        {/* Center Column (50%) - Primary Data & Analysis */}
+        <div className="col-span-6 flex flex-col gap-6">
+          {/* LIVE FEED - Top section, main interaction area */}
           <div className="flex-1 overflow-hidden">
             <LiveAuctionFeed />
           </div>
-          <OpportunitiesPanel />
+          
+          {/* PRICE TRENDS - Bottom section, full width for better readability */}
+          <div className="h-80">
+            <PriceCharts />
+          </div>
         </div>
         
-        {/* Center Column (33%) - Price Chart */}
-        <div className="col-span-4 flex flex-col gap-6">
-          <PriceCharts />
-        </div>
-        
-        {/* Right Column (33%) - Competitor Intel */}
-        <div className="col-span-4 flex flex-col gap-6">
-          <CompetitorIntel />
+        {/* Right Column (25%) - Market Context */}
+        <div className="col-span-3 flex flex-col gap-6">
+          {/* COMPETITOR INTEL - Top position */}
+          <div className="flex-1">
+            <CompetitorIntel />
+          </div>
         </div>
       </div>
     </div>
