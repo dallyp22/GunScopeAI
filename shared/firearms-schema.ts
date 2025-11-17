@@ -181,3 +181,27 @@ export const insertUserAlertSchema = createInsertSchema(userAlerts).omit({
   lastTriggered: true,
 });
 
+/**
+ * Auction Sources - Configurable scraping sources
+ */
+export const auctionSources = pgTable("auction_sources", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  url: text("url").notNull(),
+  state: text("state"),
+  city: text("city"),
+  enabled: boolean("enabled").default(true),
+  lastScraped: timestamp("last_scraped"),
+  lastSuccessful: timestamp("last_successful"),
+  totalDiscovered: integer("total_discovered").default(0),
+  totalSaved: integer("total_saved").default(0),
+  successRate: real("success_rate").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  nameIdx: index("auction_sources_name_idx").on(table.name),
+  enabledIdx: index("auction_sources_enabled_idx").on(table.enabled),
+}));
+
+export type AuctionSource = typeof auctionSources.$inferSelect;
+export type InsertAuctionSource = typeof auctionSources.$inferInsert;
+

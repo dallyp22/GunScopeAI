@@ -723,6 +723,27 @@ export async function registerRoutes(app: Express): Promise<Server | null> {
   });
 
   // ============================================================
+  // AUCTION SOURCES MANAGEMENT
+  // ============================================================
+
+  // Get all auction sources
+  app.get("/api/sources", async (req, res) => {
+    try {
+      const sources = firearmScraperService.getAllSources();
+      res.json({
+        success: true,
+        sources
+      });
+    } catch (error) {
+      console.error("Failed to get sources:", error);
+      res.status(500).json({
+        success: false,
+        message: "Internal server error"
+      });
+    }
+  });
+
+  // ============================================================
   // WEBSOCKET SUPPORT (for real-time updates)
   // ============================================================
   

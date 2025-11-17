@@ -120,6 +120,18 @@ export class FirearmScraperService {
     return this.scrapeProgress;
   }
 
+  // Get all configured sources
+  getAllSources() {
+    return this.sources.map((source, index) => ({
+      id: index + 1,
+      name: source.name,
+      url: source.url,
+      state: source.state,
+      city: source.city,
+      enabled: true
+    }));
+  }
+
   // Scrape all auction sources
   async scrapeAllSources() {
     // Generate unique scrape ID
