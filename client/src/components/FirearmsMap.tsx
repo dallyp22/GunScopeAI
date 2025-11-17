@@ -25,6 +25,7 @@ interface FirearmAuction {
 export function FirearmsMap() {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
+  const markers = useRef<maplibregl.Marker[]>([]);
   const [selectedAuction, setSelectedAuction] = useState<FirearmAuction | null>(null);
 
   const { data: auctions } = useQuery<FirearmAuction[]>({
@@ -41,24 +42,51 @@ export function FirearmsMap() {
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
 
-    // Initialize map
+    // Initialize map with Mapbox style
     map.current = new maplibregl.Map({
       container: mapContainer.current,
-      style: `https://api.mapbox.com/styles/v1/mapbox/dark-v11?access_token=${MAPBOX_TOKEN}`,
+      style: {
+        version: 8,
+        sources: {
+          'raster-tiles': {
+            type: 'raster',
+            tiles: [
+              `https://api.mapbox.com/styles/v1/mapbox/dark-v11/tiles/{z}/{x}/{y}?access_token=${MAPBOX_TOKEN}`
+            ],
+            tileSize: 256
+          }
+        },
+        layers: [
+          {
+            id: 'simple-tiles',
+            type: 'raster',
+            source: 'raster-tiles',
+            minzoom: 0,
+            maxzoom: 22
+          }
+        ]
+      },
       center: [-98.5, 39.8], // Center of US
       zoom: 4
     });
 
     map.current.addControl(new maplibregl.NavigationControl(), 'top-right');
+    
+    console.log('Map initialized');
   }, []);
 
   // Add markers when auctions load
   useEffect(() => {
-    if (!map.current || !auctions) return;
+    if (!map.current || !auctions) {
+      console.log('Map or auctions not ready', { map: !!map.current, auctions: !!auctions });
+      return;
+    }
+
+    console.log(`Adding ${auctions.length} markers to map`);
 
     // Remove existing markers
-    const existingMarkers = document.querySelectorAll('.firearm-marker');
-    existingMarkers.forEach(m => m.remove());
+    markers.current.forEach(marker => marker.remove());
+    markers.current = [];
 
     // Add new markers
     auctions.forEach((auction) => {
@@ -90,10 +118,14 @@ export function FirearmsMap() {
         setSelectedAuction(auction);
       });
 
-      new maplibregl.Marker({ element: el })
+      const marker = new maplibregl.Marker({ element: el })
         .setLngLat([auction.longitude, auction.latitude])
         .addTo(map.current!);
+      
+      markers.current.push(marker);
     });
+
+    console.log(`Added ${markers.current.length} markers`);
   }, [auctions]);
 
   return (
