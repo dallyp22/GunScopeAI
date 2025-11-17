@@ -67,47 +67,48 @@ export class FirearmScraperService {
     currentSourceProgress: 0
   };
 
-  // Source configurations for 35 firearms auction houses
+  // Source configurations for firearms auction houses
+  // CATEGORY: 'estate' = Estate sale sites, 'competitor' = Competitor auction houses
   private sources = [
-    // Texas
-    { name: 'Heritage Auctions (Arms & Armor)', state: 'TX', city: 'Dallas', url: 'https://historical.ha.com/' },
-    { name: 'Western Sportsman LLC', state: 'TX', city: 'Fort Worth', url: 'https://www.westernsportsman.auction/' },
-    { name: 'Warren Liquidation Auction & Resale (WLAR)', state: 'TX', city: 'Fort Worth', url: 'https://www.warrenliquidation.com/auction/list' },
-    { name: 'Rock Island Auction Company – Texas Facility', state: 'TX', city: 'Bedford (DFW)', url: 'https://www.rockislandauction.com/' },
-    { name: 'Texas Auction Realty', state: 'TX', city: 'Weatherford (DFW West)', url: 'https://www.texasauctionrealty.com/' },
-    { name: 'Lone Star Auctioneers (LSO)', state: 'TX', city: 'Arlington (DFW)', url: 'https://www.lso.cc/' },
-    { name: 'HiBid – Dallas-area Firearms', state: 'TX', city: 'Dallas (area hub)', url: 'https://dallas.hibid.com/auctions/40228/sporting-goods/firearms---weapons' },
-    { name: 'Right To Bear Arms Auction Co.', state: 'TX', city: 'Chico (North TX)', url: 'https://www.r2baauctions.com/' },
-    { name: 'Central Texas Auction Services', state: 'TX', city: 'Belton / Central TX', url: 'https://www.centraltexasauctionservices.com/' },
-    { name: 'A & S Auction Company', state: 'TX', city: 'Waco', url: 'https://asauctions.com/' },
-    { name: 'Brand Used Works', state: 'TX', city: 'Henderson (East TX)', url: 'https://hibid.com/company/63519/brand-used-works' },
-    { name: 'Asset Marketing Pros / Trinity Auction Gallery', state: 'TX', city: 'Trinity (East TX)', url: 'https://amp-tag.com/' },
-    { name: 'TexMax Auctions', state: 'TX', city: 'Houston', url: 'https://www.texmax.net/' },
-    { name: 'Webster\'s Auction Palace', state: 'TX', city: 'Humble (Houston)', url: 'https://webstersauction.com/' },
-    { name: 'Lewis & Maese Antiques & Auctions', state: 'TX', city: 'Houston', url: 'https://www.lmauctionco.com/' },
-    { name: 'Burley Auction Group', state: 'TX', city: 'New Braunfels (Hill Country)', url: 'https://www.burleyauction.com/' },
-    { name: 'Vogt Auction', state: 'TX', city: 'San Antonio', url: 'https://vogtauction.com/category/firearms-militaria' },
-    { name: 'Dury\'s Guns (Auctions)', state: 'TX', city: 'San Antonio', url: 'https://durysguns.com/' },
-    { name: 'South Texas Auction Company, LLC', state: 'TX', city: 'Brownsville (South TX)', url: 'https://hibid.com/company/138293/south-texas-auction-company--llc' },
-    { name: 'René Bates Auctioneers', state: 'TX', city: 'Houston / Statewide', url: 'https://www.renebates.com/' },
-    { name: 'Clark Auction Company', state: 'TX', city: 'Belton / Temple', url: 'https://www.clarkauctioncompany.com/' },
-    { name: 'Spanky\'s Online Auction', state: 'TX', city: 'Lubbock', url: 'https://spankysonline.com/' },
-    { name: 'Ward Real Estate & Auction', state: 'TX', city: 'Corpus Christi / South TX', url: 'https://www.wardrealestateauctions.com/' },
-    { name: 'Canyon Auctions', state: 'TX', city: 'Amarillo / Canyon', url: 'https://www.canyonauctions.com/' },
+    // Texas - ESTATE AUCTION SITES
+    { name: 'Heritage Auctions (Arms & Armor)', state: 'TX', city: 'Dallas', url: 'https://historical.ha.com/', category: 'estate' },
+    { name: 'Western Sportsman LLC', state: 'TX', city: 'Fort Worth', url: 'https://www.westernsportsman.auction/', category: 'estate' },
+    { name: 'Warren Liquidation Auction & Resale (WLAR)', state: 'TX', city: 'Fort Worth', url: 'https://www.warrenliquidation.com/auction/list', category: 'estate' },
+    { name: 'Rock Island Auction Company – Texas Facility', state: 'TX', city: 'Bedford (DFW)', url: 'https://www.rockislandauction.com/', category: 'estate' },
+    { name: 'Texas Auction Realty', state: 'TX', city: 'Weatherford (DFW West)', url: 'https://www.texasauctionrealty.com/', category: 'estate' },
+    { name: 'Lone Star Auctioneers (LSO)', state: 'TX', city: 'Arlington (DFW)', url: 'https://www.lso.cc/', category: 'estate' },
+    { name: 'HiBid – Dallas-area Firearms', state: 'TX', city: 'Dallas (area hub)', url: 'https://dallas.hibid.com/auctions/40228/sporting-goods/firearms---weapons', category: 'estate' },
+    { name: 'Right To Bear Arms Auction Co.', state: 'TX', city: 'Chico (North TX)', url: 'https://www.r2baauctions.com/', category: 'estate' },
+    { name: 'Central Texas Auction Services', state: 'TX', city: 'Belton / Central TX', url: 'https://www.centraltexasauctionservices.com/', category: 'estate' },
+    { name: 'A & S Auction Company', state: 'TX', city: 'Waco', url: 'https://asauctions.com/', category: 'estate' },
+    { name: 'Brand Used Works', state: 'TX', city: 'Henderson (East TX)', url: 'https://hibid.com/company/63519/brand-used-works', category: 'estate' },
+    { name: 'Asset Marketing Pros / Trinity Auction Gallery', state: 'TX', city: 'Trinity (East TX)', url: 'https://amp-tag.com/', category: 'estate' },
+    { name: 'TexMax Auctions', state: 'TX', city: 'Houston', url: 'https://www.texmax.net/', category: 'estate' },
+    { name: 'Webster\'s Auction Palace', state: 'TX', city: 'Humble (Houston)', url: 'https://webstersauction.com/', category: 'estate' },
+    { name: 'Lewis & Maese Antiques & Auctions', state: 'TX', city: 'Houston', url: 'https://www.lmauctionco.com/', category: 'estate' },
+    { name: 'Burley Auction Group', state: 'TX', city: 'New Braunfels (Hill Country)', url: 'https://www.burleyauction.com/', category: 'estate' },
+    { name: 'Vogt Auction', state: 'TX', city: 'San Antonio', url: 'https://vogtauction.com/category/firearms-militaria', category: 'estate' },
+    { name: 'Dury\'s Guns (Auctions)', state: 'TX', city: 'San Antonio', url: 'https://durysguns.com/', category: 'estate' },
+    { name: 'South Texas Auction Company, LLC', state: 'TX', city: 'Brownsville (South TX)', url: 'https://hibid.com/company/138293/south-texas-auction-company--llc', category: 'estate' },
+    { name: 'René Bates Auctioneers', state: 'TX', city: 'Houston / Statewide', url: 'https://www.renebates.com/', category: 'estate' },
+    { name: 'Clark Auction Company', state: 'TX', city: 'Belton / Temple', url: 'https://www.clarkauctioncompany.com/', category: 'estate' },
+    { name: 'Spanky\'s Online Auction', state: 'TX', city: 'Lubbock', url: 'https://spankysonline.com/', category: 'estate' },
+    { name: 'Ward Real Estate & Auction', state: 'TX', city: 'Corpus Christi / South TX', url: 'https://www.wardrealestateauctions.com/', category: 'estate' },
+    { name: 'Canyon Auctions', state: 'TX', city: 'Amarillo / Canyon', url: 'https://www.canyonauctions.com/', category: 'estate' },
     
-    // Oklahoma
-    { name: 'Chupps Auction & Real Estate', state: 'OK', city: 'Pawnee / Tulsa area', url: 'https://chuppsauction.hibid.com/' },
-    { name: 'Wiggins Auctioneers', state: 'OK', city: 'Enid / North OK', url: 'https://www.wigginsauctioneers.com/' },
-    { name: 'Smith & Co. Auction & Realty', state: 'OK', city: 'Woodward / NW OK', url: 'https://www.smithcoauctions.com/' },
-    { name: 'Pickens Auction', state: 'OK', city: 'Mustang / OKC', url: 'https://www.pickensauctions.com/' },
-    { name: 'Aline Auction', state: 'OK', city: 'Aline / NW OK', url: 'https://www.alineauction.com/' },
-    { name: 'Ball Auction Service', state: 'OK', city: 'Stillwater', url: 'https://ballauctionservice.com/' },
+    // Oklahoma - ESTATE AUCTION SITES
+    { name: 'Chupps Auction & Real Estate', state: 'OK', city: 'Pawnee / Tulsa area', url: 'https://chuppsauction.hibid.com/', category: 'estate' },
+    { name: 'Wiggins Auctioneers', state: 'OK', city: 'Enid / North OK', url: 'https://www.wigginsauctioneers.com/', category: 'estate' },
+    { name: 'Smith & Co. Auction & Realty', state: 'OK', city: 'Woodward / NW OK', url: 'https://www.smithcoauctions.com/', category: 'estate' },
+    { name: 'Pickens Auction', state: 'OK', city: 'Mustang / OKC', url: 'https://www.pickensauctions.com/', category: 'estate' },
+    { name: 'Aline Auction', state: 'OK', city: 'Aline / NW OK', url: 'https://www.alineauction.com/', category: 'estate' },
+    { name: 'Ball Auction Service', state: 'OK', city: 'Stillwater', url: 'https://ballauctionservice.com/', category: 'estate' },
     
-    // Louisiana
-    { name: 'Bonnette Auctions', state: 'LA', city: 'Alexandria', url: 'https://bonnetteauctions.com/' },
-    { name: 'Lawler Auction Company', state: 'LA', city: 'Shreveport', url: 'https://www.lawlerauction.com/' },
-    { name: 'Henderson Auctions', state: 'LA', city: 'Baton Rouge / Livingston', url: 'https://www.hendersonauctions.com/' },
-    { name: 'Stokes & Hubbell Auctioneers', state: 'LA', city: 'Lafayette / Acadiana', url: 'https://www.stokesandhubbell.com/' }
+    // Louisiana - ESTATE AUCTION SITES
+    { name: 'Bonnette Auctions', state: 'LA', city: 'Alexandria', url: 'https://bonnetteauctions.com/', category: 'estate' },
+    { name: 'Lawler Auction Company', state: 'LA', city: 'Shreveport', url: 'https://www.lawlerauction.com/', category: 'estate' },
+    { name: 'Henderson Auctions', state: 'LA', city: 'Baton Rouge / Livingston', url: 'https://www.hendersonauctions.com/', category: 'estate' },
+    { name: 'Stokes & Hubbell Auctioneers', state: 'LA', city: 'Lafayette / Acadiana', url: 'https://www.stokesandhubbell.com/', category: 'estate' }
   ];
 
   // Get stats from last scrape
@@ -121,15 +122,29 @@ export class FirearmScraperService {
   }
 
   // Get all configured sources
-  getAllSources() {
-    return this.sources.map((source, index) => ({
+  getAllSources(category?: 'estate' | 'competitor') {
+    const filtered = category 
+      ? this.sources.filter(s => s.category === category)
+      : this.sources;
+    
+    return filtered.map((source, index) => ({
       id: index + 1,
       name: source.name,
       url: source.url,
       state: source.state,
       city: source.city,
+      category: source.category,
       enabled: true
     }));
+  }
+
+  // Get sources by category
+  getEstateAuctionSources() {
+    return this.getAllSources('estate');
+  }
+
+  getCompetitorSources() {
+    return this.getAllSources('competitor');
   }
 
   // Scrape all auction sources

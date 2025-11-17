@@ -12,6 +12,7 @@ interface ScrapeProgress {
 
 export function ScraperControls() {
   const [isScrapingInProgress, setIsScrapingInProgress] = useState(false);
+  const [sourceCategory, setSourceCategory] = useState<'estate' | 'competitor'>('estate');
   const { toast } = useToast();
 
   // Get scrape progress
@@ -95,6 +96,30 @@ export function ScraperControls() {
         </h3>
       </div>
 
+      {/* Category Toggle */}
+      <div className="flex gap-1 mb-3">
+        <button
+          onClick={() => setSourceCategory('estate')}
+          className={`flex-1 py-2 text-xs font-mono uppercase tracking-wider transition-all ${
+            sourceCategory === 'estate'
+              ? 'bg-[#252a28] text-[#00ff41] border border-[#00ff4166]'
+              : 'bg-transparent text-[#00ff4166] border border-[#00ff4133] hover:text-[#00ff41]'
+          }`}
+        >
+          Estate Auctions
+        </button>
+        <button
+          onClick={() => setSourceCategory('competitor')}
+          className={`flex-1 py-2 text-xs font-mono uppercase tracking-wider transition-all ${
+            sourceCategory === 'competitor'
+              ? 'bg-[#252a28] text-[#00ff41] border border-[#00ff4166]'
+              : 'bg-transparent text-[#00ff4166] border border-[#00ff4133] hover:text-[#00ff41]'
+          }`}
+        >
+          Competitors
+        </button>
+      </div>
+
       {/* Scrape Button */}
       <button
         onClick={() => {
@@ -156,12 +181,16 @@ export function ScraperControls() {
       {/* Stats */}
       <div className="space-y-2 text-xs font-mono">
         <div className="flex justify-between border-b border-[#00ff4133] pb-1">
-          <span className="text-[#00ff4166]">Last Scrape:</span>
-          <span className="text-[#00ff41]">Never</span>
+          <span className="text-[#00ff4166]">Category:</span>
+          <span className="text-[#00ff41]">{sourceCategory === 'estate' ? 'Estate Auctions' : 'Competitors'}</span>
         </div>
         <div className="flex justify-between border-b border-[#00ff4133] pb-1">
-          <span className="text-[#00ff4166]">Total Sources:</span>
-          <span className="text-[#00ff41]">35</span>
+          <span className="text-[#00ff4166]">Sources:</span>
+          <span className="text-[#00ff41]">{sourceCategory === 'estate' ? '35' : '0'}</span>
+        </div>
+        <div className="flex justify-between border-b border-[#00ff4133] pb-1">
+          <span className="text-[#00ff4166]">Last Scrape:</span>
+          <span className="text-[#00ff41]">Never</span>
         </div>
         <div className="flex justify-between">
           <span className="text-[#00ff4166]">Status:</span>
@@ -170,6 +199,15 @@ export function ScraperControls() {
           </span>
         </div>
       </div>
+      
+      {/* Add Competitor Note */}
+      {sourceCategory === 'competitor' && (
+        <div className="mt-3 p-2 border border-[#ffb00033] bg-[#252a28]">
+          <div className="text-[10px] text-[#ffb000] font-mono">
+            No competitor sources configured yet. Add them in Sources view.
+          </div>
+        </div>
+      )}
     </div>
   );
 }
