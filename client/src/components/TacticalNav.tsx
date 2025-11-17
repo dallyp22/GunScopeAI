@@ -6,67 +6,43 @@ export function TacticalNav() {
   const isActive = (path: string) => location === path;
 
   return (
-    <div className="h-14 border-b border-[#00ff4133] bg-[#1a1f1d] scanlines flex items-center justify-between px-6">
+    <div className="h-12 border-b border-[#2a3040] bg-[#1a1d23] flex items-center justify-between px-6">
       {/* Logo/Title */}
       <div className="flex items-center gap-3">
         <img 
           src="/gunscope-logo.png" 
           alt="GunScope AI" 
-          className="h-10 w-10 object-contain"
-          style={{ filter: 'drop-shadow(0 0 8px rgba(0, 255, 65, 0.6))' }}
+          className="h-8 w-8 object-contain"
         />
         <div>
-          <h1 className="hud-text-bright text-lg font-bold uppercase tracking-wider">
+          <h1 className="text-base font-semibold text-white">
             GunScope AI
           </h1>
-          <div className="text-[10px] text-[#00ff4166] font-mono uppercase tracking-wider">
-            Firearms Intelligence Platform
-          </div>
         </div>
       </div>
 
-      {/* Navigation */}
+      {/* Navigation Pills */}
       <div className="flex items-center gap-2">
         <Link href="/">
-          <a className={`
-            px-4 py-2 font-mono text-sm uppercase tracking-wider transition-all
-            ${isActive('/') 
-              ? 'bg-[#252a28] text-[#00ff41] border border-[#00ff4166] shadow-[0_0_10px_rgba(0,255,65,0.3)]' 
-              : 'text-[#00ff4166] hover:text-[#00ff41] hover:bg-[#252a28]'}
-          `}>
+          <a className={`pill-tab ${isActive('/') ? 'pill-tab-active' : ''}`}>
             Dashboard
           </a>
         </Link>
 
         <Link href="/map">
-          <a className={`
-            px-4 py-2 font-mono text-sm uppercase tracking-wider transition-all
-            ${isActive('/map') 
-              ? 'bg-[#252a28] text-[#00ff41] border border-[#00ff4166] shadow-[0_0_10px_rgba(0,255,65,0.3)]' 
-              : 'text-[#00ff4166] hover:text-[#00ff41] hover:bg-[#252a28]'}
-          `}>
+          <a className={`pill-tab ${isActive('/map') ? 'pill-tab-active' : ''}`}>
             Map
           </a>
         </Link>
 
         <Link href="/list">
-          <a className={`
-            px-4 py-2 font-mono text-sm uppercase tracking-wider transition-all
-            ${isActive('/list') 
-              ? 'bg-[#252a28] text-[#00ff41] border border-[#00ff4166] shadow-[0_0_10px_rgba(0,255,65,0.3)]' 
-              : 'text-[#00ff4166] hover:text-[#00ff41] hover:bg-[#252a28]'}
-          `}>
+          <a className={`pill-tab ${isActive('/list') ? 'pill-tab-active' : ''}`}>
             List
           </a>
         </Link>
 
         <Link href="/sources">
-          <a className={`
-            px-4 py-2 font-mono text-sm uppercase tracking-wider transition-all
-            ${isActive('/sources') 
-              ? 'bg-[#252a28] text-[#00ff41] border border-[#00ff4166] shadow-[0_0_10px_rgba(0,255,65,0.3)]' 
-              : 'text-[#00ff4166] hover:text-[#00ff41] hover:bg-[#252a28]'}
-          `}>
+          <a className={`pill-tab ${isActive('/sources') ? 'pill-tab-active' : ''}`}>
             Sources
           </a>
         </Link>
@@ -74,10 +50,9 @@ export function TacticalNav() {
 
       {/* Status Indicator */}
       <div className="flex items-center gap-2">
-        <div className="w-2 h-2 bg-[#00ff41] rounded-full animate-pulse" />
-        <span className="text-xs text-[#00ff41] font-mono">OPERATIONAL</span>
+        <div className="w-2 h-2 bg-[#10B981] rounded-full subtle-pulse" />
+        <span className="text-xs text-[#10B981] font-medium">Live</span>
       </div>
     </div>
   );
 }
-

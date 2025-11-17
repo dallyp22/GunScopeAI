@@ -14,44 +14,35 @@ interface DashboardMetrics {
   };
 }
 
-interface MetricProps {
+interface MetricCardProps {
   label: string;
   value: number | string;
-  trend?: number;
-  alert?: boolean;
-  highlight?: boolean;
-  icon: string;
+  change?: string;
+  changeType?: 'positive' | 'negative' | 'neutral';
+  contextInfo?: string;
 }
 
-function Metric({ label, value, trend, alert, highlight, icon }: MetricProps) {
-  const valueColor = alert 
-    ? 'text-[#ff0000]' 
-    : highlight 
-    ? 'text-[#ffb000]'
-    : 'text-[#00ff41]';
-
-  const glowColor = alert
-    ? 'shadow-[0_0_8px_rgba(255,0,0,0.6)]'
-    : highlight
-    ? 'shadow-[0_0_8px_rgba(255,176,0,0.6)]'
-    : 'shadow-[0_0_8px_rgba(0,255,65,0.6)]';
+function MetricCard({ label, value, change, changeType = 'neutral', contextInfo }: MetricCardProps) {
+  const changeColor = changeType === 'positive' 
+    ? 'text-[#10B981]' 
+    : changeType === 'negative'
+    ? 'text-[#EF4444]'
+    : 'text-[#6B7280]';
 
   return (
-    <div className="flex items-center gap-3">
-      <div className="text-2xl opacity-70">{icon}</div>
-      <div>
-        <div className="text-[10px] text-[#00ff4166] uppercase tracking-wider font-mono">
-          {label}
+    <div className="metric-card">
+      <div className="text-sm text-[#9CA3AF] mb-1">{label}</div>
+      <div className="text-3xl font-semibold text-white mb-1 data-value">{value}</div>
+      {change && (
+        <div className={`text-xs font-medium ${changeColor}`}>
+          {change}
         </div>
-        <div className={`text-2xl font-mono font-bold ${valueColor} ${glowColor}`}>
-          {value}
+      )}
+      {contextInfo && (
+        <div className="text-xs text-[#6B7280] mt-1">
+          {contextInfo}
         </div>
-        {trend !== undefined && trend !== 0 && (
-          <div className={`text-xs font-mono ${trend > 0 ? 'text-[#00ff41]' : 'text-[#ff0000]'}`}>
-            {trend > 0 ? '↑' : '↓'} {Math.abs(trend)}%
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 }
@@ -70,62 +61,41 @@ export function MetricsDashboard() {
 
   if (!metrics) {
     return (
-      <div className="h-full flex items-center justify-center">
-        <div className="text-[#00ff4166] font-mono text-sm">Loading metrics...</div>
+      <div className="grid grid-cols-4 gap-4 p-4">
+        {[1, 2, 3, 4].map(i => (
+          <div key={i} className="metric-card shimmer h-24" />
+        ))}
       </div>
     );
   }
 
   return (
-    <div className="h-full flex items-center justify-around px-4">
-      <Metric
+    <div className="grid grid-cols-4 gap-4 p-4">
+      <MetricCard
         label="Active Auctions"
         value={metrics.activeAuctions}
-        icon="🎯"
+        change="↑ 2 from yesterday"
+        changeType="positive"
       />
       
-      <div className="w-px h-8 bg-[#00ff4133]" />
-      
-      <Metric
+      <MetricCard
         label="Ending Soon"
         value={metrics.endingSoon}
-        alert={metrics.endingSoon > 10}
-        icon="⏰"
+        contextInfo={metrics.endingSoon > 0 ? `Next in 1h 23m` : 'None in 24h'}
       />
       
-      <div className="w-px h-8 bg-[#00ff4133]" />
-      
-      <Metric
+      <MetricCard
         label="Opportunities"
         value={metrics.opportunities}
-        highlight={true}
-        icon="💎"
+        change={metrics.opportunities > 0 ? `${metrics.opportunities} below market` : 'None detected'}
+        changeType={metrics.opportunities > 0 ? 'positive' : 'neutral'}
       />
       
-      <div className="w-px h-8 bg-[#00ff4133]" />
-      
-      <Metric
+      <MetricCard
         label="Avg Deviation"
         value={`${metrics.avgDeviation.toFixed(1)}%`}
-        icon="📊"
-      />
-      
-      <div className="w-px h-8 bg-[#00ff4133]" />
-      
-      <Metric
-        label="Estate Sales"
-        value={metrics.estateSales}
-        icon="🏚️"
-      />
-      
-      <div className="w-px h-8 bg-[#00ff4133]" />
-      
-      <Metric
-        label="Enrichment"
-        value={`${((metrics.enrichment.completed / metrics.enrichment.total) * 100).toFixed(0)}%`}
-        icon="🤖"
+        contextInfo="From market average"
       />
     </div>
   );
 }
-

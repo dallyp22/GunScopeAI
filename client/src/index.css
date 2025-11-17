@@ -1,5 +1,5 @@
-/* Import Roboto Mono font for HUD feel - must be first */
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;600;700&display=swap');
+/* Import modern fonts - must be first */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -230,7 +230,22 @@ a,
   }
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
+    background-color: #0f1419;
+    color: #F9FAFB;
+  }
+  
+  /* Typography hierarchy */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+  }
+  
+  /* Tabular data */
+  .tabular, table {
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
   }
 }
 
@@ -892,28 +907,37 @@ textarea {
 }
 
 /* ============================================================
-   GUNSCOPE AI - TACTICAL/MILITARY HUD THEME
+   GUNSCOPE AI - CONTEMPORARY PROFESSIONAL THEME
    ============================================================ */
 
 :root {
-  /* Tactical color palette - Military HUD inspired */
-  --tactical-green: #00ff41;
-  --tactical-green-dark: #00cc33;
-  --tactical-amber: #ffb000;
-  --tactical-red: #ff0000;
-  --hud-blue: #00d4ff;
-  --night-vision-green: #39ff14;
+  /* Modern color palette - Professional & Sophisticated */
+  --accent-primary: #00D4FF;
+  --accent-success: #10B981;
+  --accent-warning: #F59E0B;
+  --accent-danger: #EF4444;
+  --accent-neutral: #6B7280;
   
-  /* Dark backgrounds */
-  --bg-primary: #0a0f0d;
-  --bg-secondary: #1a1f1d;
-  --bg-elevated: #252a28;
-  --bg-card: #1e2422;
+  /* Backgrounds - Deep charcoal with navy undertones */
+  --bg-primary: #0f1419;
+  --bg-secondary: #1a1d23;
+  --bg-card: #242832;
+  --bg-elevated: #2a3040;
   
-  /* Grid/wireframe */
-  --grid-color: rgba(0, 255, 65, 0.1);
-  --border-tactical: rgba(0, 255, 65, 0.3);
-  --border-tactical-bright: rgba(0, 255, 65, 0.6);
+  /* Text hierarchy */
+  --text-primary: #F9FAFB;
+  --text-secondary: #9CA3AF;
+  --text-muted: #6B7280;
+  
+  /* Borders */
+  --border-subtle: #2a3040;
+  --border-default: #374151;
+  --border-emphasis: #4B5563;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.15);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.18);
 }
 
 /* HUD-style borders with glow */
@@ -1242,4 +1266,258 @@ textarea {
 
 .glitch-effect {
   animation: glitch 0.3s ease-in-out;
+}
+
+/* ============================================================
+   CONTEMPORARY DESIGN SYSTEM - MODERN UTILITIES
+   ============================================================ */
+
+/* Metric Cards - Modern card design */
+.metric-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: transform 200ms ease-out, box-shadow 200ms ease-out;
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Data Values - Clean number display */
+.data-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-feature-settings: 'tnum';
+  font-variant-numeric: tabular-nums;
+}
+
+/* Subtle Shadow */
+.subtle-shadow {
+  box-shadow: var(--shadow-sm);
+}
+
+/* Modern Card */
+.modern-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 1rem;
+  transition: all 200ms ease-out;
+}
+
+.modern-card:hover {
+  border-color: var(--border-emphasis);
+  box-shadow: var(--shadow-md);
+}
+
+/* Pill Tabs - Modern navigation */
+.pill-tab {
+  padding: 6px 16px;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 200ms ease-out;
+  color: var(--text-secondary);
+}
+
+.pill-tab-active {
+  background: rgba(0, 212, 255, 0.1);
+  border: 1px solid var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+.pill-tab:hover:not(.pill-tab-active) {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+}
+
+/* Smooth Transitions */
+.smooth-hover {
+  transition: transform 200ms ease-out, box-shadow 200ms ease-out;
+}
+
+.smooth-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Frosted Glass Effect */
+.frosted-glass {
+  background: rgba(26, 29, 35, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Modern Button */
+.modern-btn {
+  background: var(--accent-primary);
+  color: white;
+  padding: 0.625rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 200ms ease-out;
+  border: none;
+  cursor: pointer;
+}
+
+.modern-btn:hover {
+  background: #00B8E6;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);
+}
+
+.modern-btn:active {
+  transform: translateY(0);
+}
+
+.modern-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Segmented Control */
+.segmented-control {
+  background: var(--bg-elevated);
+  border-radius: 8px;
+  padding: 4px;
+  display: flex;
+  gap: 4px;
+}
+
+.segmented-control-option {
+  flex: 1;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  transition: all 200ms ease-out;
+  cursor: pointer;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.segmented-control-option-active {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Progress Bar - Modern smooth */
+.modern-progress-bar {
+  height: 6px;
+  background: var(--bg-elevated);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.modern-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-success));
+  border-radius: 9999px;
+  transition: width 300ms ease-out;
+}
+
+/* Shimmer Loading Effect */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, 
+    var(--bg-card) 0%, 
+    var(--bg-elevated) 50%, 
+    var(--bg-card) 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Count-up Animation */
+.count-up {
+  transition: all 300ms ease-out;
+}
+
+/* Subtle Pulse */
+.subtle-pulse {
+  animation: subtlePulse 2s ease-in-out infinite;
+}
+
+@keyframes subtlePulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Modern Scrollbar */
+.modern-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.modern-scrollbar::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: 4px;
+}
+
+.modern-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--border-emphasis);
+  border-radius: 4px;
+}
+
+.modern-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-neutral);
+}
+
+/* Badge Styles */
+.badge-success {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: var(--accent-success);
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.badge-warning {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: var(--accent-warning);
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.badge-danger {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--accent-danger);
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.badge-primary {
+  background: rgba(0, 212, 255, 0.1);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  color: var(--accent-primary);
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
 }
