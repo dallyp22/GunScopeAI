@@ -1,9 +1,7 @@
-import { auctionEnrichmentService } from './auctionEnrichment.js';
-import { legalDescriptionGeocoderService } from './legalDescriptionGeocoder.js';
+import { firearmEnrichmentService } from './firearmEnrichment.js';
 import { db } from '../db.js';
-import { auctions } from '@shared/schema';
+import { firearmsAuctions } from '@shared/firearms-schema';
 import { eq } from 'drizzle-orm';
-import { Pool } from '@neondatabase/serverless';
 
 interface QueueItem {
   auctionId: number;
@@ -28,14 +26,6 @@ export class EnrichmentQueue {
   private maxConcurrent: number = 3;
   private maxRetries: number = 2;
   private stats: ProcessingStats | null = null;
-  private pool: Pool | null = null;
-
-  /**
-   * Set database pool for geocoding
-   */
-  setPool(pool: Pool) {
-    this.pool = pool;
-  }
 
   /**
    * Add auction to enrichment queue
@@ -88,50 +78,18 @@ export class EnrichmentQueue {
   }
 
   /**
-   * Process a single auction with geocoding
+   * Process a single firearm auction with AI enrichment
    */
   private async processAuction(auctionId: number): Promise<void> {
     try {
-      console.log(`\n📦 Processing auction ${auctionId}...`);
+      console.log(`\n📦 Processing firearms auction ${auctionId}...`);
       
-      // Step 1: Enrich with OpenAI
-      const enrichmentResult = await auctionEnrichmentService.enrichAuction(auctionId);
+      // Enrich with OpenAI
+      await firearmEnrichmentService.enrichFirearmAuction(auctionId);
       
-      // Step 2: Geocode if we have location data
-      if (this.pool && (enrichmentResult.legalDescription || enrichmentResult.enrichedPropertyLocation)) {
-        console.log(`   🌍 Geocoding auction ${auctionId}...`);
-        
-        const { geocodeWithCascade } = await import('./legalDescriptionGeocoder.js');
-        
-        const geocodeResult = await geocodeWithCascade(
-          enrichmentResult.enrichedPropertyLocation || null,
-          enrichmentResult.legalDescription || null,
-          null, // county will be derived from auction data
-          'Iowa',
-          this.pool
-        );
-
-        if (geocodeResult) {
-          // Update auction with geocoding results
-          await db.update(auctions)
-            .set({
-              latitude: geocodeResult.latitude,
-              longitude: geocodeResult.longitude,
-              geocodingMethod: geocodeResult.method,
-              geocodingConfidence: geocodeResult.confidence,
-              geocodingSource: geocodeResult.source
-            })
-            .where(eq(auctions.id, auctionId));
-          
-          console.log(`   ✅ Geocoded: ${geocodeResult.latitude}, ${geocodeResult.longitude} (${geocodeResult.method})`);
-        } else {
-          console.log(`   ⚠️  Geocoding failed, will use existing coordinates if available`);
-        }
-      }
-
-      console.log(`✅ Successfully processed auction ${auctionId}`);
+      console.log(`✅ Successfully processed firearms auction ${auctionId}`);
     } catch (error: any) {
-      console.error(`❌ Failed to process auction ${auctionId}:`, error.message);
+      console.error(`❌ Failed to process firearms auction ${auctionId}:`, error.message);
       throw error;
     }
   }
@@ -258,16 +216,23 @@ export class EnrichmentQueue {
 export const enrichmentQueue = new EnrichmentQueue();
 
 /**
- * Helper function to enrich all pending auctions
+ * Helper function to add auction to queue
  */
-export async function enrichAllPendingAuctions(pool?: Pool): Promise<ProcessingStats> {
-  console.log('\n🔍 Finding all pending auctions...');
+export function addToQueue(auctionId: number, priority: 'high' | 'normal' | 'low' = 'normal'): void {
+  enrichmentQueue.add(auctionId, priority);
+}
+
+/**
+ * Helper function to enrich all pending firearms auctions
+ */
+export async function enrichAllPendingAuctions(): Promise<ProcessingStats> {
+  console.log('\n🔍 Finding all pending firearms auctions...');
   
-  const pendingAuctions = await db.query.auctions.findMany({
-    where: eq(auctions.enrichmentStatus, 'pending')
+  const pendingAuctions = await db.query.firearmsAuctions.findMany({
+    where: eq(firearmsAuctions.enrichmentStatus, 'pending')
   });
 
-  console.log(`📊 Found ${pendingAuctions.length} pending auctions`);
+  console.log(`📊 Found ${pendingAuctions.length} pending firearms auctions`);
 
   if (pendingAuctions.length === 0) {
     return {
@@ -281,11 +246,6 @@ export async function enrichAllPendingAuctions(pool?: Pool): Promise<ProcessingS
     };
   }
 
-  // Set pool if provided
-  if (pool) {
-    enrichmentQueue.setPool(pool);
-  }
-
   // Add to queue
   const auctionIds = pendingAuctions.map(a => a.id);
   enrichmentQueue.addBatch(auctionIds, 'normal');
@@ -295,25 +255,19 @@ export async function enrichAllPendingAuctions(pool?: Pool): Promise<ProcessingS
 }
 
 /**
- * Helper function to re-enrich all auctions
+ * Helper function to re-enrich all firearms auctions
  */
-export async function reEnrichAllAuctions(pool?: Pool): Promise<ProcessingStats> {
-  console.log('\n🔄 Re-enriching ALL auctions...');
+export async function reEnrichAllAuctions(): Promise<ProcessingStats> {
+  console.log('\n🔄 Re-enriching ALL firearms auctions...');
   
   // Get all auctions
-  const allAuctions = await db.query.auctions.findMany();
-  console.log(`📊 Found ${allAuctions.length} total auctions`);
+  const allAuctions = await db.query.firearmsAuctions.findMany();
+  console.log(`📊 Found ${allAuctions.length} total firearms auctions`);
 
   // Reset all to pending
-  await db.update(auctions).set({ 
-    enrichmentStatus: 'pending',
-    enrichmentError: null 
+  await db.update(firearmsAuctions).set({ 
+    enrichmentStatus: 'pending'
   });
-
-  // Set pool if provided
-  if (pool) {
-    enrichmentQueue.setPool(pool);
-  }
 
   // Add to queue
   const auctionIds = allAuctions.map(a => a.id);

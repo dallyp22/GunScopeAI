@@ -3,7 +3,7 @@ import { db } from '../db.js';
 import { firearmsAuctions } from '@shared/firearms-schema';
 import { eq } from 'drizzle-orm';
 import { scraperDiagnosticsService } from './scraperDiagnostics.js';
-import { enrichmentQueue } from './enrichmentQueue.js';
+import { addToQueue } from './enrichmentQueue.js';
 
 // Scraper statistics interface for diagnostics
 export interface ScraperStats {
@@ -258,7 +258,7 @@ export class FirearmScraperService {
               stats.successfulSaves++;
               
               // Queue for AI enrichment
-              await enrichmentQueue.addToQueue(inserted[0].id);
+              addToQueue(inserted[0].id);
             }
           } else {
             // Update existing auction
@@ -352,7 +352,7 @@ export class FirearmScraperService {
         saved = inserted[0];
         
         // Queue for enrichment
-        await enrichmentQueue.addToQueue(saved.id);
+        addToQueue(saved.id);
       } else {
         saved = existing[0];
       }
