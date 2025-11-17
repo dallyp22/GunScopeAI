@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { Button } from '@/components/ui/button';
-import { formatDistanceToNow } from 'date-fns';
+import { useToast } from '@/hooks/use-toast';
 
 interface ScrapeProgress {
   isActive: boolean;
@@ -13,6 +12,7 @@ interface ScrapeProgress {
 
 export function ScraperControls() {
   const [isScrapingInProgress, setIsScrapingInProgress] = useState(false);
+  const { toast } = useToast();
 
   // Get scrape progress
   const { data: progress } = useQuery<ScrapeProgress>({
@@ -30,27 +30,59 @@ export function ScraperControls() {
   // Trigger scraping
   const scrapeMutation = useMutation({
     mutationFn: async () => {
+      console.log('Starting scrape mutation...');
       const response = await fetch('/api/firearms/refresh', { method: 'POST' });
+      console.log('Scrape response:', response.status);
       if (!response.ok) throw new Error('Failed to start scraping');
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('Scrape started successfully:', data);
       setIsScrapingInProgress(true);
+      toast({
+        title: "Scraping Started",
+        description: "Scraping all 35 auction sources in background",
+      });
       // Stop polling after 10 minutes
       setTimeout(() => setIsScrapingInProgress(false), 600000);
+    },
+    onError: (error) => {
+      console.error('Scrape error:', error);
+      toast({
+        title: "Scraping Failed",
+        description: error instanceof Error ? error.message : "Unknown error",
+        variant: "destructive"
+      });
     }
   });
 
   // Trigger enrichment
   const enrichMutation = useMutation({
     mutationFn: async () => {
+      console.log('Starting enrichment mutation...');
       const response = await fetch('/api/firearms/enrich-all', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ force: false })
       });
+      console.log('Enrichment response:', response.status);
       if (!response.ok) throw new Error('Failed to start enrichment');
       return response.json();
+    },
+    onSuccess: (data) => {
+      console.log('Enrichment started:', data);
+      toast({
+        title: "Enrichment Started",
+        description: data.message || "Processing auctions with AI",
+      });
+    },
+    onError: (error) => {
+      console.error('Enrichment error:', error);
+      toast({
+        title: "Enrichment Failed",
+        description: error instanceof Error ? error.message : "Unknown error",
+        variant: "destructive"
+      });
     }
   });
 
@@ -64,8 +96,11 @@ export function ScraperControls() {
       </div>
 
       {/* Scrape Button */}
-      <Button
-        onClick={() => scrapeMutation.mutate()}
+      <button
+        onClick={() => {
+          console.log('Scraper button clicked');
+          scrapeMutation.mutate();
+        }}
         disabled={scrapeMutation.isPending || progress?.isActive}
         className="w-full tactical-btn mb-3"
       >
@@ -77,7 +112,7 @@ export function ScraperControls() {
         ) : (
           '🔫 RUN SCRAPER'
         )}
-      </Button>
+      </button>
 
       {/* Progress Display */}
       {progress?.isActive && (
@@ -100,8 +135,11 @@ export function ScraperControls() {
       )}
 
       {/* Enrich Button */}
-      <Button
-        onClick={() => enrichMutation.mutate()}
+      <button
+        onClick={() => {
+          console.log('Enrich button clicked');
+          enrichMutation.mutate();
+        }}
         disabled={enrichMutation.isPending}
         className="w-full tactical-btn mb-3"
       >
@@ -113,7 +151,7 @@ export function ScraperControls() {
         ) : (
           '🤖 ENRICH ALL'
         )}
-      </Button>
+      </button>
 
       {/* Stats */}
       <div className="space-y-2 text-xs font-mono">
