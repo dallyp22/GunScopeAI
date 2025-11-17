@@ -209,10 +209,7 @@ export class FirearmScraperService {
 
     try {
       // Use Firecrawl to scrape the auction house
-      const response = await firecrawlService.scrapeUrl(source.url, {
-        formats: ['markdown', 'html'],
-        wait: 2000
-      });
+      const response = await firecrawlService.scrape(source.url);
 
       if (!response || !response.data) {
         stats.failedScrapes = 1;
@@ -222,10 +219,12 @@ export class FirearmScraperService {
       }
 
       // Extract auction listings using Firecrawl's extract feature
-      const extractedData = await firecrawlService.extractStructuredData(
-        response.data.markdown || response.data.html || '',
-        firearmAuctionSchema
-      );
+      const extractedData = await firecrawlService.extract({
+        urls: [source.url],
+        prompt: "Extract all firearms auction listings from this page",
+        schema: firearmAuctionSchema,
+        allowExternalLinks: false
+      });
 
       const auctions = extractedData?.auctions || [];
       stats.discoveredUrls = auctions.length;
@@ -309,20 +308,19 @@ export class FirearmScraperService {
     console.log(`Scraping single URL: ${url}`);
     
     try {
-      const response = await firecrawlService.scrapeUrl(url, {
-        formats: ['markdown', 'html'],
-        wait: 2000
-      });
+      const response = await firecrawlService.scrape(url);
 
       if (!response || !response.data) {
         throw new Error('Failed to scrape URL');
       }
 
       // Use Firecrawl to extract structured data
-      const extractedData = await firecrawlService.extractStructuredData(
-        response.data.markdown || response.data.html || '',
-        firearmAuctionSchema
-      );
+      const extractedData = await firecrawlService.extract({
+        urls: [url],
+        prompt: "Extract firearms auction information from this page",
+        schema: firearmAuctionSchema,
+        allowExternalLinks: false
+      });
 
       const auctionData = extractedData?.auctions?.[0];
       
