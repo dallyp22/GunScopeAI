@@ -40,6 +40,11 @@ const generalRateLimiter = createRateLimiter(300, 60000); // 300 req/min
 const scrapingRateLimiter = createRateLimiter(10, 60000); // 10 req/min
 
 export async function registerRoutes(app: Express): Promise<Server | null> {
+  // Simple ping endpoint (no database) for Railway healthcheck
+  app.get("/api/ping", (req, res) => {
+    res.json({ status: "ok", timestamp: new Date().toISOString() });
+  });
+
   // Health check endpoint - simplified for Railway healthcheck
   app.get("/api/health", async (req, res) => {
     try {
