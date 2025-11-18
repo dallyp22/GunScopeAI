@@ -188,7 +188,7 @@ export function FirearmsMap() {
                   <!-- Category info -->
                   <div class="flex items-center justify-between">
                     <span class="text-xs text-[#6B7280] uppercase tracking-wide">Type</span>
-                    <span class="text-sm text-white font-medium">Competitor Marketplace</span>
+                    <span class="text-sm text-white font-medium">Competitor</span>
                   </div>
                   
                   <!-- Status badge -->
