@@ -71,24 +71,30 @@ export default function SourcesView() {
 
           {/* Sources Grid */}
           {filteredSources.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredSources.map((source) => (
-                <div key={source.id} className="tactical-card p-4 hover:border-[#00ff4166] transition-all">
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="text-sm text-[#00ff41] font-mono font-bold">
+                <a
+                  key={source.id}
+                  href={source.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="modern-card p-4 smooth-hover cursor-pointer block"
+                >
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="text-sm text-white font-semibold">
                       {source.name}
                     </div>
-                    <div className="tactical-badge-green">
+                    <div className="badge-success">
                       {source.state}
                     </div>
                   </div>
-                  <div className="text-xs text-[#00ff4166] font-mono mb-2">
-                    {source.city}
+                  <div className="text-xs text-[#9CA3AF] mb-3">
+                    📍 {source.city}
                   </div>
-                  <div className="text-[10px] text-[#00ff4133] font-mono truncate">
-                    {source.url}
+                  <div className="text-xs text-[#00D4FF] hover:underline truncate">
+                    Visit Site →
                   </div>
-                </div>
+                </a>
               ))}
             </div>
           ) : (
