@@ -63,7 +63,7 @@ export class FirearmScraperService {
     isActive: false,
     currentSource: '',
     completedSources: 0,
-    totalSources: 46, // 35 estate + 11 competitor
+    totalSources: 46, // 36 estate (35 + Morphy) + 10 competitor
     currentSourceProgress: 0
   };
 
@@ -110,6 +110,9 @@ export class FirearmScraperService {
     { name: 'Henderson Auctions', state: 'LA', city: 'Baton Rouge / Livingston', url: 'https://www.hendersonauctions.com/', category: 'estate' },
     { name: 'Stokes & Hubbell Auctioneers', state: 'LA', city: 'Lafayette / Acadiana', url: 'https://www.stokesandhubbell.com/', category: 'estate' },
     
+    // Pennsylvania - ESTATE AUCTION SITES  
+    { name: 'Morphy Auctions', state: 'PA', city: 'Denver', url: 'https://morphyauctions.com/auctions/', category: 'estate', latitude: 40.2338, longitude: -76.0869, requiresTwoStage: true },
+    
     // ============================================================
     // COMPETITOR AUCTION HOUSES - Major Firearms Marketplaces
     // ============================================================
@@ -117,7 +120,6 @@ export class FirearmScraperService {
     { name: 'GunAuction.com', state: 'FL', city: 'Tampa', url: 'https://www.gunauction.com/', category: 'competitor', latitude: 27.9506, longitude: -82.4572 },
     { name: 'GunsAmerica.com', state: 'SD', city: 'Rapid City', url: 'https://gunsamerica.com/', category: 'competitor', latitude: 44.0805, longitude: -103.2310 },
     { name: 'GunSpot.com', state: 'AZ', city: 'Phoenix', url: 'https://gunspot.com/', category: 'competitor', latitude: 33.4484, longitude: -112.0740 },
-    { name: 'Morphy Auctions', state: 'PA', city: 'Denver', url: 'https://morphyauctions.com/auctions/', category: 'competitor', latitude: 40.2338, longitude: -76.0869 },
     { name: 'Summit Gun Auctions', state: 'OH', city: 'Columbus', url: 'https://www.summitgunauctions.com/', category: 'competitor', latitude: 39.9612, longitude: -82.9988 },
     { name: 'FirearmLand', state: 'WA', city: 'Seattle', url: 'https://firearmland.com/', category: 'competitor', latitude: 47.6062, longitude: -122.3321 },
     { name: 'Gun Runner Auctions', state: 'MD', city: 'Baltimore', url: 'https://www.gunrunnerauctions.com/', category: 'competitor', latitude: 39.2904, longitude: -76.6122 },
@@ -162,6 +164,122 @@ export class FirearmScraperService {
 
   getCompetitorSources() {
     return this.getAllSources('competitor');
+  }
+
+  // Two-stage scraping for complex auction sites (like Morphy)
+  private async scrapeTwoStage(source: any, stats: ScraperStats, startTime: number) {
+    console.log(`🔄 Two-stage scraping: ${source.name}`);
+    
+    try {
+      // STAGE 1: Get list of auction URLs from main page
+      console.log(`  Stage 1: Discovering auction URLs from ${source.url}`);
+      
+      const mainPageResponse = await firecrawlService.scrape(source.url);
+      
+      if (!mainPageResponse || !mainPageResponse.data) {
+        stats.failedScrapes = 1;
+        stats.duration = Date.now() - startTime;
+        this.lastScrapeStats.push(stats);
+        return [];
+      }
+
+      // Use Firecrawl map to discover auction URLs
+      const mapResponse = await firecrawlService.map(source.url, 'firearms auction');
+      const auctionUrls = mapResponse?.links?.filter((link: string) => 
+        link.includes('auction') || link.includes('firearms')
+      ).slice(0, 10) || []; // Limit to first 10 auctions
+      
+      console.log(`  Found ${auctionUrls.length} potential auction URLs`);
+      stats.discoveredUrls = auctionUrls.length;
+
+      // STAGE 2: Scrape each auction page for firearms
+      const allFirearms: any[] = [];
+      
+      for (const auctionUrl of auctionUrls) {
+        try {
+          console.log(`  Stage 2: Scraping auction ${auctionUrl}`);
+          
+          const auctionResponse = await firecrawlService.scrape(auctionUrl);
+          
+          if (auctionResponse && auctionResponse.data) {
+            const content = auctionResponse.data.markdown || '';
+            
+            // Look for firearms keywords
+            const hasFirearms = /firearm|gun|rifle|pistol|shotgun|revolver/i.test(content);
+            
+            if (hasFirearms) {
+              allFirearms.push({
+                title: `Firearms Auction from ${source.name}`,
+                url: auctionUrl,
+                description: content.substring(0, 200),
+                sourceWebsite: source.name,
+                city: source.city,
+                state: source.state,
+                category: null,
+                manufacturer: null,
+                model: null
+              });
+            }
+          }
+          
+          stats.processedUrls++;
+          
+          // Rate limiting delay
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+        } catch (error) {
+          console.error(`    Failed to scrape ${auctionUrl}:`, error);
+          stats.failedScrapes++;
+        }
+      }
+      
+      console.log(`  ✅ Found ${allFirearms.length} firearms auctions from ${source.name}`);
+      
+      // Save discovered firearms to database
+      const savedAuctions = [];
+      for (const firearm of allFirearms) {
+        try {
+          const existing = await db.select()
+            .from(firearmsAuctions)
+            .where(eq(firearmsAuctions.url, firearm.url))
+            .limit(1);
+
+          if (existing.length === 0) {
+            const inserted = await db.insert(firearmsAuctions).values({
+              title: firearm.title,
+              url: firearm.url,
+              sourceWebsite: firearm.sourceWebsite,
+              description: firearm.description,
+              city: firearm.city,
+              state: firearm.state,
+              enrichmentStatus: 'pending',
+              status: 'active'
+            }).returning();
+
+            if (inserted.length > 0) {
+              savedAuctions.push(inserted[0]);
+              stats.successfulSaves++;
+              addToQueue(inserted[0].id);
+            }
+          }
+        } catch (error) {
+          console.error(`Failed to save auction:`, error);
+          stats.failedSaves++;
+        }
+      }
+
+      stats.duration = Date.now() - startTime;
+      this.lastScrapeStats.push(stats);
+      
+      return savedAuctions;
+      
+    } catch (error) {
+      console.error(`Two-stage scraping failed for ${source.name}:`, error);
+      stats.failedScrapes = 1;
+      stats.duration = Date.now() - startTime;
+      this.lastScrapeStats.push(stats);
+      return [];
+    }
   }
 
   // Scrape all auction sources
@@ -240,7 +358,12 @@ export class FirearmScraperService {
     };
 
     try {
-      // Use Firecrawl to scrape the auction house
+      // Check if this source requires two-stage scraping
+      if (source.requiresTwoStage) {
+        return await this.scrapeTwoStage(source, stats, startTime);
+      }
+
+      // Standard single-stage scrape
       const response = await firecrawlService.scrape(source.url);
 
       if (!response || !response.data) {
@@ -250,14 +373,9 @@ export class FirearmScraperService {
         return [];
       }
 
-      // For now, extract from markdown/html content
-      // In production, you'd use Firecrawl's extract with a more detailed prompt
       const content = response.data.markdown || response.data.html || '';
-      
       console.log(`Scraped ${source.name}, content length: ${content.length}`);
       
-      // Simple extraction: look for auction-like patterns in content
-      // This is a placeholder - real extraction would parse the HTML/markdown properly
       const auctions: any[] = [];
       
       // For initial testing, create a sample auction if we got content
