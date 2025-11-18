@@ -161,7 +161,7 @@ export function FirearmsMap() {
         el.style.cursor = 'pointer';
         el.style.boxShadow = '0 3px 10px rgba(0,0,0,0.4)';
         
-        // Add enhanced popup on click
+        // Add professional popup on click
         el.addEventListener('click', (e) => {
           e.stopPropagation();
           e.preventDefault();
@@ -169,41 +169,48 @@ export function FirearmsMap() {
           new maplibregl.Popup({ 
             closeButton: true, 
             closeOnClick: true,
-            maxWidth: '320px',
+            maxWidth: '340px',
             className: 'competitor-popup'
           })
             .setLngLat([source.longitude, source.latitude])
             .setHTML(`
-              <div class="p-4 bg-[#1a1d23]">
-                <div class="flex items-start gap-3 mb-3">
-                  <div class="w-10 h-10 rounded-full bg-[#A855F7] flex items-center justify-center flex-shrink-0">
-                    <span class="text-white text-lg">🎯</span>
-                  </div>
+              <div class="p-0">
+                <!-- Header with clear separation -->
+                <div class="flex items-start justify-between p-5 pb-4 border-b border-[#374151]">
                   <div class="flex-1">
-                    <div class="font-semibold text-white text-sm mb-1">${source.name}</div>
-                    <div class="text-xs text-[#9CA3AF]">${source.city}, ${source.state}</div>
+                    <h3 class="text-base font-semibold text-white mb-1">${source.name}</h3>
+                    <p class="text-sm text-[#9CA3AF]">${source.city}, ${source.state}</p>
                   </div>
                 </div>
                 
-                <div class="space-y-2 mb-3">
-                  <div class="flex items-center justify-between text-xs">
-                    <span class="text-[#6B7280]">Category</span>
-                    <span class="text-[#00D4FF] font-medium">Competitor Marketplace</span>
+                <!-- Content with better spacing -->
+                <div class="p-5 pt-4 space-y-4">
+                  <!-- Category info -->
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs text-[#6B7280] uppercase tracking-wide">Type</span>
+                    <span class="text-sm text-white font-medium">Competitor Marketplace</span>
                   </div>
-                  <div class="flex items-center justify-between text-xs">
-                    <span class="text-[#6B7280]">Status</span>
-                    <span class="text-[#10B981] font-medium">● Active</span>
+                  
+                  <!-- Status badge -->
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs text-[#6B7280] uppercase tracking-wide">Status</span>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[rgba(16,185,129,0.1)] border border-[rgba(16,185,129,0.3)]">
+                      <span class="w-1.5 h-1.5 bg-[#10B981] rounded-full"></span>
+                      <span class="text-xs text-[#10B981] font-medium">Active</span>
+                    </span>
                   </div>
+                  
+                  <!-- CTA Button -->
+                  <a 
+                    href="${source.url}" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    class="block w-full text-center py-2.5 px-4 rounded-lg bg-[#00D4FF] text-white text-sm font-medium hover:bg-[#00B8E6] transition-all shadow-sm hover:shadow-md"
+                    style="margin-top: 16px;"
+                  >
+                    Visit Auction House →
+                  </a>
                 </div>
-                
-                <a 
-                  href="${source.url}" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  class="block w-full text-center py-2 px-4 rounded-lg bg-[#00D4FF] text-white text-sm font-medium hover:bg-[#00B8E6] transition-colors"
-                >
-                  Visit Auction House →
-                </a>
               </div>
             `)
             .addTo(map.current!);
