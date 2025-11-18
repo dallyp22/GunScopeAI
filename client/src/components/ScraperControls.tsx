@@ -162,7 +162,7 @@ export function ScraperControls() {
               <div className="flex justify-between items-center cursor-help">
                 <span className="text-[#9CA3AF]">Sources</span>
                 <span className="text-white font-medium data-value">
-                  {sourceCategory === 'estate' ? '35' : '11'}
+                  {sourceCategory === 'estate' ? '36' : '10'}
                 </span>
               </div>
             </TooltipTrigger>
@@ -203,10 +203,10 @@ export function ScraperControls() {
       {sourceCategory === 'competitor' && (
         <div className="mt-4 p-3 rounded-lg bg-[rgba(0,212,255,0.05)] border border-[rgba(0,212,255,0.2)]">
           <div className="text-xs text-[#00D4FF] font-medium">
-            11 major marketplaces configured
+            10 major marketplaces configured
           </div>
           <div className="text-xs text-[#6B7280] mt-1">
-            GunBroker, Morphy, GunsAmerica +8 more
+            GunBroker, GunsAmerica, GunSpot +7 more
           </div>
         </div>
       )}
