@@ -88,37 +88,56 @@ export function FirearmsMap() {
     markers.current.forEach(marker => marker.remove());
     markers.current = [];
 
-    // Add new markers
+    // Add new markers with crosshair design
     auctions.forEach((auction) => {
       if (!auction.latitude || !auction.longitude) return;
 
+      // Create crosshair marker
       const el = document.createElement('div');
       el.className = 'firearm-marker';
-      el.style.width = '24px';
-      el.style.height = '24px';
-      el.style.borderRadius = '50%';
+      el.style.width = '32px';
+      el.style.height = '32px';
       el.style.cursor = 'pointer';
-      el.style.border = '2px solid #00ff41';
-      el.style.boxShadow = '0 0 10px rgba(0, 255, 65, 0.6)';
+      el.style.position = 'relative';
       
-      // Color by category
-      if (auction.category === 'Handgun') {
-        el.style.backgroundColor = '#00d4ff';
-      } else if (auction.category === 'Rifle') {
-        el.style.backgroundColor = '#00ff41';
-      } else if (auction.category === 'Shotgun') {
-        el.style.backgroundColor = '#ffb000';
-      } else if (auction.category === 'Machine Gun') {
-        el.style.backgroundColor = '#ff0000';
-      } else {
-        el.style.backgroundColor = '#9ca3af';
-      }
+      // Determine color by category
+      let color = '#9ca3af';
+      if (auction.category === 'Handgun') color = '#00D4FF';
+      else if (auction.category === 'Rifle') color = '#10B981';
+      else if (auction.category === 'Shotgun') color = '#F59E0B';
+      else if (auction.category === 'Machine Gun') color = '#EF4444';
+      
+      // Create crosshair SVG
+      el.innerHTML = `
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Outer ring -->
+          <circle cx="16" cy="16" r="12" stroke="${color}" stroke-width="2" fill="none" opacity="0.4"/>
+          <!-- Inner circle -->
+          <circle cx="16" cy="16" r="4" stroke="${color}" stroke-width="2" fill="${color}" opacity="0.6"/>
+          <!-- Crosshair lines -->
+          <line x1="16" y1="4" x2="16" y2="12" stroke="${color}" stroke-width="2"/>
+          <line x1="16" y1="20" x2="16" y2="28" stroke="${color}" stroke-width="2"/>
+          <line x1="4" y1="16" x2="12" y2="16" stroke="${color}" stroke-width="2"/>
+          <line x1="20" y1="16" x2="28" y2="16" stroke="${color}" stroke-width="2"/>
+        </svg>
+      `;
+      
+      // Hover effect
+      el.addEventListener('mouseenter', () => {
+        el.style.transform = 'scale(1.2)';
+        el.style.filter = `drop-shadow(0 0 8px ${color})`;
+      });
+      
+      el.addEventListener('mouseleave', () => {
+        el.style.transform = 'scale(1)';
+        el.style.filter = 'none';
+      });
 
       el.addEventListener('click', () => {
         setSelectedAuction(auction);
       });
 
-      const marker = new maplibregl.Marker({ element: el })
+      const marker = new maplibregl.Marker({ element: el, anchor: 'center' })
         .setLngLat([auction.longitude, auction.latitude])
         .addTo(map.current!);
       
@@ -135,28 +154,56 @@ export function FirearmsMap() {
         <div ref={mapContainer} className="w-full h-full" />
         
         {/* Legend */}
-        <div className="absolute bottom-4 left-4 tactical-border bg-[#1a1f1d] p-3 scanlines">
-          <div className="text-xs text-[#00ff41] font-mono uppercase mb-2">Categories</div>
-          <div className="space-y-1 text-xs font-mono">
+        <div className="absolute bottom-4 left-4 modern-card p-4">
+          <div className="text-xs font-semibold text-white mb-3">Categories</div>
+          <div className="space-y-2 text-sm">
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full" style={{backgroundColor: '#00d4ff', border: '1px solid #00ff41'}} />
-              <span className="text-[#00ff4166]">Handgun</span>
+              <svg width="16" height="16" viewBox="0 0 32 32" className="flex-shrink-0">
+                <circle cx="16" cy="16" r="12" stroke="#00D4FF" strokeWidth="2" fill="none" opacity="0.4"/>
+                <circle cx="16" cy="16" r="4" stroke="#00D4FF" strokeWidth="2" fill="#00D4FF" opacity="0.6"/>
+                <line x1="16" y1="4" x2="16" y2="12" stroke="#00D4FF" strokeWidth="2"/>
+                <line x1="16" y1="20" x2="16" y2="28" stroke="#00D4FF" strokeWidth="2"/>
+                <line x1="4" y1="16" x2="12" y2="16" stroke="#00D4FF" strokeWidth="2"/>
+                <line x1="20" y1="16" x2="28" y2="16" stroke="#00D4FF" strokeWidth="2"/>
+              </svg>
+              <span className="text-[#9CA3AF]">Handgun</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full" style={{backgroundColor: '#00ff41', border: '1px solid #00ff41'}} />
-              <span className="text-[#00ff4166]">Rifle</span>
+              <svg width="16" height="16" viewBox="0 0 32 32" className="flex-shrink-0">
+                <circle cx="16" cy="16" r="12" stroke="#10B981" strokeWidth="2" fill="none" opacity="0.4"/>
+                <circle cx="16" cy="16" r="4" stroke="#10B981" strokeWidth="2" fill="#10B981" opacity="0.6"/>
+                <line x1="16" y1="4" x2="16" y2="12" stroke="#10B981" strokeWidth="2"/>
+                <line x1="16" y1="20" x2="16" y2="28" stroke="#10B981" strokeWidth="2"/>
+                <line x1="4" y1="16" x2="12" y2="16" stroke="#10B981" strokeWidth="2"/>
+                <line x1="20" y1="16" x2="28" y2="16" stroke="#10B981" strokeWidth="2"/>
+              </svg>
+              <span className="text-[#9CA3AF]">Rifle</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full" style={{backgroundColor: '#ffb000', border: '1px solid #00ff41'}} />
-              <span className="text-[#00ff4166]">Shotgun</span>
+              <svg width="16" height="16" viewBox="0 0 32 32" className="flex-shrink-0">
+                <circle cx="16" cy="16" r="12" stroke="#F59E0B" strokeWidth="2" fill="none" opacity="0.4"/>
+                <circle cx="16" cy="16" r="4" stroke="#F59E0B" strokeWidth="2" fill="#F59E0B" opacity="0.6"/>
+                <line x1="16" y1="4" x2="16" y2="12" stroke="#F59E0B" strokeWidth="2"/>
+                <line x1="16" y1="20" x2="16" y2="28" stroke="#F59E0B" strokeWidth="2"/>
+                <line x1="4" y1="16" x2="12" y2="16" stroke="#F59E0B" strokeWidth="2"/>
+                <line x1="20" y1="16" x2="28" y2="16" stroke="#F59E0B" strokeWidth="2"/>
+              </svg>
+              <span className="text-[#9CA3AF]">Shotgun</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full" style={{backgroundColor: '#ff0000', border: '1px solid #00ff41'}} />
-              <span className="text-[#00ff4166]">Machine Gun</span>
+              <svg width="16" height="16" viewBox="0 0 32 32" className="flex-shrink-0">
+                <circle cx="16" cy="16" r="12" stroke="#EF4444" strokeWidth="2" fill="none" opacity="0.4"/>
+                <circle cx="16" cy="16" r="4" stroke="#EF4444" strokeWidth="2" fill="#EF4444" opacity="0.6"/>
+                <line x1="16" y1="4" x2="16" y2="12" stroke="#EF4444" strokeWidth="2"/>
+                <line x1="16" y1="20" x2="16" y2="28" stroke="#EF4444" strokeWidth="2"/>
+                <line x1="4" y1="16" x2="12" y2="16" stroke="#EF4444" strokeWidth="2"/>
+                <line x1="20" y1="16" x2="28" y2="16" stroke="#EF4444" strokeWidth="2"/>
+              </svg>
+              <span className="text-[#9CA3AF]">Machine Gun</span>
             </div>
           </div>
-          <div className="text-[10px] text-[#00ff4133] font-mono mt-2">
-            {auctions?.length || 0} AUCTIONS MAPPED
+          <div className="text-xs text-[#6B7280] mt-3 pt-3 border-t border-[#374151]">
+            {auctions?.length || 0} auctions mapped
           </div>
         </div>
       </div>

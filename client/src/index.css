@@ -1521,3 +1521,12 @@ textarea {
   font-size: 0.75rem;
   font-weight: 500;
 }
+
+/* Crosshair Markers - Smooth animations */
+.firearm-marker {
+  transition: transform 200ms ease-out, filter 200ms ease-out;
+}
+
+.firearm-marker svg {
+  display: block;
+}
