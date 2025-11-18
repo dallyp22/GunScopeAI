@@ -285,7 +285,7 @@ export class FirearmScraperService {
     }
   }
 
-  // Scrape all auction sources
+  // Scrape all auction sources (SEQUENTIAL with rate limiting)
   async scrapeAllSources() {
     // Generate unique scrape ID
     this.currentScrapeId = `scrape_${Date.now()}_${Math.random().toString(36).substring(7)}`;
@@ -302,6 +302,9 @@ export class FirearmScraperService {
     
     const results = [];
     
+    console.log(`🚀 Starting SEQUENTIAL scrape of ${this.sources.length} sources`);
+    console.log(`⏱️  Rate limiting: 2 second delay between sources`);
+    
     for (let i = 0; i < this.sources.length; i++) {
       const source = this.sources[i];
       try {
@@ -309,13 +312,19 @@ export class FirearmScraperService {
         this.scrapeProgress.currentSource = source.name;
         this.scrapeProgress.completedSources = i;
         
-        console.log(`Scraping ${source.name}...`);
+        console.log(`\n[${i + 1}/${this.sources.length}] Scraping ${source.name}...`);
         const auctions = await this.scrapeSingleSource(source);
         results.push(...auctions);
         console.log(`✅ ${source.name}: Found ${auctions.length} firearms auctions`);
         
         // Mark as completed
         this.scrapeProgress.completedSources = i + 1;
+        
+        // RATE LIMITING: Wait 2 seconds between sources
+        if (i < this.sources.length - 1) {
+          console.log(`  ⏳ Waiting 2 seconds before next source...`);
+          await new Promise(resolve => setTimeout(resolve, 2000));
+        }
       } catch (error) {
         console.error(`❌ Failed to scrape ${source.name}:`, error instanceof Error ? error.message : error);
         this.scrapeProgress.completedSources = i + 1;

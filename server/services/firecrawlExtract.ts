@@ -94,18 +94,42 @@ export class FirecrawlExtractService {
         return { firearms: [] };
       }
 
-      // STEP 2: Extract firearms from discovered pages
+      // STEP 2: Extract firearms from discovered pages (in batches to respect rate limits)
       console.log(`  🔄 Step 2: Extracting firearms from ${auctionUrls.length} pages`);
       
-      const result = await firecrawlService.extract({
-        urls: auctionUrls,
-        prompt: extractionPrompt,
-        schema: firearmExtractionSchema,
-        allowExternalLinks: false
-      });
+      // Process in smaller batches to avoid hitting Firecrawl concurrency limits
+      const batchSize = 5;
+      const allFirearms: any[] = [];
       
-      const firearmsFound = result.data?.firearms?.length || 0;
+      for (let i = 0; i < auctionUrls.length; i += batchSize) {
+        const batch = auctionUrls.slice(i, i + batchSize);
+        console.log(`    Processing batch ${Math.floor(i / batchSize) + 1} (${batch.length} URLs)...`);
+        
+        try {
+          const result = await firecrawlService.extract({
+            urls: batch,
+            prompt: extractionPrompt,
+            schema: firearmExtractionSchema,
+            allowExternalLinks: false
+          });
+          
+          if (result.data?.firearms) {
+            allFirearms.push(...result.data.firearms);
+          }
+          
+          // Small delay between batches
+          if (i + batchSize < auctionUrls.length) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
+        } catch (error) {
+          console.error(`    ❌ Batch extraction failed:`, error);
+        }
+      }
+      
+      const firearmsFound = allFirearms.length;
       console.log(`  ✅ Extracted ${firearmsFound} firearms from ${source.name}`);
+      
+      const result = { data: { firearms: allFirearms } };
       
       // Save to cache
       if (firearmsFound > 0) {
