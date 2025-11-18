@@ -108,24 +108,23 @@ export function FirearmsMap() {
       el.style.border = '2px solid white';
       el.style.cursor = 'pointer';
       el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
-      el.style.transition = 'transform 200ms ease-out, box-shadow 200ms ease-out';
+      el.style.pointerEvents = 'auto';
       
-      // Hover effect
-      el.addEventListener('mouseenter', () => {
-        el.style.transform = 'scale(1.4)';
-        el.style.boxShadow = `0 4px 12px ${color}80`;
-      });
-      
-      el.addEventListener('mouseleave', () => {
-        el.style.transform = 'scale(1)';
-        el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
-      });
-
-      el.addEventListener('click', () => {
+      // Click handler with proper event stopping
+      const handleClick = (e: Event) => {
+        e.stopPropagation();
+        e.preventDefault();
         setSelectedAuction(auction);
-      });
+      };
 
-      const marker = new maplibregl.Marker({ element: el, anchor: 'center' })
+      el.addEventListener('click', handleClick);
+      el.addEventListener('touchend', handleClick);
+
+      const marker = new maplibregl.Marker({ 
+        element: el, 
+        anchor: 'center',
+        draggable: false // Prevent dragging
+      })
         .setLngLat([auction.longitude, auction.latitude])
         .addTo(map.current!);
       
