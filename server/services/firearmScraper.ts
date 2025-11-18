@@ -186,8 +186,10 @@ export class FirearmScraperService {
 
       // Use Firecrawl map to discover auction URLs
       const mapResponse = await firecrawlService.map(source.url, 'firearms auction');
-      const auctionUrls = mapResponse?.links?.filter((link: string) => 
-        link.includes('auction') || link.includes('firearms')
+      const auctionUrls = mapResponse?.links?.map((link: any) => 
+        typeof link === 'string' ? link : link.url
+      ).filter((url: string) => 
+        url && (url.includes('auction') || url.includes('firearms') || url.includes('item'))
       ).slice(0, 10) || []; // Limit to first 10 auctions
       
       console.log(`  Found ${auctionUrls.length} potential auction URLs`);

@@ -55,51 +55,60 @@ Return empty array if no firearms found.`;
 
 export class FirecrawlExtractService {
   /**
-   * Extract firearms from an auction site using Firecrawl's extract endpoint
+   * Extract firearms from an auction site using map + extract strategy
+   * More reliable than wildcard extraction
    */
   async extractFromAuctionSite(source: any) {
     console.log(`🔍 Firecrawl Extract: ${source.name}`);
     
     try {
-      // Check cache first
-      const cachedMap = await scrapingCacheService.getSiteMap(source.url);
+      // STEP 1: Use map() to discover auction pages
+      console.log(`  📍 Step 1: Discovering pages with map()`);
+      const mapResponse = await firecrawlService.map(source.url, 'firearms guns auction');
       
-      if (cachedMap && new Date(cachedMap.expiresAt) > new Date()) {
-        console.log(`  📦 Cache valid for ${source.name} (expires in ${Math.round((new Date(cachedMap.expiresAt).getTime() - Date.now()) / 1000 / 60)} min)`);
-        
-        // Use map to find current URLs
-        const mapResponse = await firecrawlService.map(source.url, 'firearms auction');
-        const currentUrls = mapResponse?.links?.map((l: any) => l.url) || [];
-        
-        // Get only new URLs
-        const newUrls = await scrapingCacheService.getNewUrls(source.url, currentUrls);
-        
-        if (newUrls.length === 0) {
-          console.log(`  ✅ No new pages for ${source.name} - skipping`);
-          return { firearms: [] };
-        }
-        
-        console.log(`  🔄 Found ${newUrls.length} new pages to extract`);
-        // Extract only from new pages
-        return await this.extractFromUrls(newUrls, source);
+      if (!mapResponse || !mapResponse.links) {
+        console.log(`  ❌ No links discovered from ${source.name}`);
+        return { firearms: [] };
       }
+
+      // Extract URLs from link objects
+      const allUrls = mapResponse.links
+        .map((link: any) => typeof link === 'string' ? link : link.url)
+        .filter((url: string) => url && url.startsWith('http'));
       
-      // Full extraction with wildcard
-      const extractUrl = source.extractUrl || `${source.url}/*`;
-      console.log(`  🌐 Full extraction from ${extractUrl}`);
+      console.log(`  📊 Discovered ${allUrls.length} total URLs`);
+      
+      // Filter for auction/firearms pages
+      const auctionUrls = allUrls.filter((url: string) => 
+        url.includes('auction') || 
+        url.includes('firearms') || 
+        url.includes('gun') ||
+        url.includes('item') ||
+        url.includes('lot')
+      ).slice(0, 20); // Limit to 20 pages
+      
+      console.log(`  🎯 Filtered to ${auctionUrls.length} potential auction pages`);
+      
+      if (auctionUrls.length === 0) {
+        console.log(`  ⚠️  No auction pages found for ${source.name}`);
+        return { firearms: [] };
+      }
+
+      // STEP 2: Extract firearms from discovered pages
+      console.log(`  🔄 Step 2: Extracting firearms from ${auctionUrls.length} pages`);
       
       const result = await firecrawlService.extract({
-        urls: [extractUrl],
+        urls: auctionUrls,
         prompt: extractionPrompt,
         schema: firearmExtractionSchema,
-        allowExternalLinks: false,
-        includeSubdomains: false
+        allowExternalLinks: false
       });
       
-      console.log(`  ✅ Extracted ${result.data?.firearms?.length || 0} firearms`);
+      const firearmsFound = result.data?.firearms?.length || 0;
+      console.log(`  ✅ Extracted ${firearmsFound} firearms from ${source.name}`);
       
       // Save to cache
-      if (result.data?.firearms) {
+      if (firearmsFound > 0) {
         const discoveredUrls = result.data.firearms
           .map((f: any) => f.auctionUrl)
           .filter((url: string) => url);
@@ -107,8 +116,8 @@ export class FirecrawlExtractService {
         await scrapingCacheService.saveSiteMap(
           source.url,
           source.name,
-          discoveredUrls,
-          result.data.firearms.length
+          auctionUrls, // Save all auction URLs we found
+          firearmsFound
         );
       }
       
