@@ -88,7 +88,7 @@ export function FirearmsMap() {
     markers.current.forEach(marker => marker.remove());
     markers.current = [];
 
-    // Add new markers with CSS crosshair design
+    // Add simple circle markers
     auctions.forEach((auction) => {
       if (!auction.latitude || !auction.longitude) return;
 
@@ -99,89 +99,26 @@ export function FirearmsMap() {
       else if (auction.category === 'Shotgun') color = '#F59E0B';
       else if (auction.category === 'Machine Gun') color = '#EF4444';
 
-      // Create crosshair marker using CSS
+      // Create simple marker
       const el = document.createElement('div');
-      el.className = 'crosshair-marker';
-      el.style.width = '32px';
-      el.style.height = '32px';
-      el.style.position = 'relative';
+      el.style.width = '20px';
+      el.style.height = '20px';
+      el.style.borderRadius = '50%';
+      el.style.backgroundColor = color;
+      el.style.border = '2px solid white';
       el.style.cursor = 'pointer';
-      
-      // Outer ring
-      const outerRing = document.createElement('div');
-      outerRing.style.position = 'absolute';
-      outerRing.style.width = '24px';
-      outerRing.style.height = '24px';
-      outerRing.style.borderRadius = '50%';
-      outerRing.style.border = `2px solid ${color}`;
-      outerRing.style.opacity = '0.4';
-      outerRing.style.top = '4px';
-      outerRing.style.left = '4px';
-      
-      // Inner dot
-      const innerDot = document.createElement('div');
-      innerDot.style.position = 'absolute';
-      innerDot.style.width = '8px';
-      innerDot.style.height = '8px';
-      innerDot.style.borderRadius = '50%';
-      innerDot.style.backgroundColor = color;
-      innerDot.style.border = `1px solid ${color}`;
-      innerDot.style.top = '12px';
-      innerDot.style.left = '12px';
-      
-      // Vertical line top
-      const vLineTop = document.createElement('div');
-      vLineTop.style.position = 'absolute';
-      vLineTop.style.width = '2px';
-      vLineTop.style.height = '8px';
-      vLineTop.style.backgroundColor = color;
-      vLineTop.style.top = '0';
-      vLineTop.style.left = '15px';
-      
-      // Vertical line bottom
-      const vLineBottom = document.createElement('div');
-      vLineBottom.style.position = 'absolute';
-      vLineBottom.style.width = '2px';
-      vLineBottom.style.height = '8px';
-      vLineBottom.style.backgroundColor = color;
-      vLineBottom.style.bottom = '0';
-      vLineBottom.style.left = '15px';
-      
-      // Horizontal line left
-      const hLineLeft = document.createElement('div');
-      hLineLeft.style.position = 'absolute';
-      hLineLeft.style.width = '8px';
-      hLineLeft.style.height = '2px';
-      hLineLeft.style.backgroundColor = color;
-      hLineLeft.style.top = '15px';
-      hLineLeft.style.left = '0';
-      
-      // Horizontal line right
-      const hLineRight = document.createElement('div');
-      hLineRight.style.position = 'absolute';
-      hLineRight.style.width = '8px';
-      hLineRight.style.height = '2px';
-      hLineRight.style.backgroundColor = color;
-      hLineRight.style.top = '15px';
-      hLineRight.style.right = '0';
-      
-      // Assemble crosshair
-      el.appendChild(outerRing);
-      el.appendChild(innerDot);
-      el.appendChild(vLineTop);
-      el.appendChild(vLineBottom);
-      el.appendChild(hLineLeft);
-      el.appendChild(hLineRight);
+      el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
+      el.style.transition = 'transform 200ms ease-out, box-shadow 200ms ease-out';
       
       // Hover effect
       el.addEventListener('mouseenter', () => {
-        el.style.transform = 'scale(1.3)';
-        el.style.filter = `drop-shadow(0 0 6px ${color})`;
+        el.style.transform = 'scale(1.4)';
+        el.style.boxShadow = `0 4px 12px ${color}80`;
       });
       
       el.addEventListener('mouseleave', () => {
         el.style.transform = 'scale(1)';
-        el.style.filter = 'none';
+        el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
       });
 
       el.addEventListener('click', () => {
@@ -209,47 +146,19 @@ export function FirearmsMap() {
           <div className="text-xs font-semibold text-white mb-3">Categories</div>
           <div className="space-y-2 text-sm">
             <div className="flex items-center gap-2">
-              <svg width="16" height="16" viewBox="0 0 32 32" className="flex-shrink-0">
-                <circle cx="16" cy="16" r="12" stroke="#00D4FF" strokeWidth="2" fill="none" opacity="0.4"/>
-                <circle cx="16" cy="16" r="4" stroke="#00D4FF" strokeWidth="2" fill="#00D4FF" opacity="0.6"/>
-                <line x1="16" y1="4" x2="16" y2="12" stroke="#00D4FF" strokeWidth="2"/>
-                <line x1="16" y1="20" x2="16" y2="28" stroke="#00D4FF" strokeWidth="2"/>
-                <line x1="4" y1="16" x2="12" y2="16" stroke="#00D4FF" strokeWidth="2"/>
-                <line x1="20" y1="16" x2="28" y2="16" stroke="#00D4FF" strokeWidth="2"/>
-              </svg>
+              <div className="w-4 h-4 rounded-full bg-[#00D4FF] border-2 border-white shadow-sm" />
               <span className="text-[#9CA3AF]">Handgun</span>
             </div>
             <div className="flex items-center gap-2">
-              <svg width="16" height="16" viewBox="0 0 32 32" className="flex-shrink-0">
-                <circle cx="16" cy="16" r="12" stroke="#10B981" strokeWidth="2" fill="none" opacity="0.4"/>
-                <circle cx="16" cy="16" r="4" stroke="#10B981" strokeWidth="2" fill="#10B981" opacity="0.6"/>
-                <line x1="16" y1="4" x2="16" y2="12" stroke="#10B981" strokeWidth="2"/>
-                <line x1="16" y1="20" x2="16" y2="28" stroke="#10B981" strokeWidth="2"/>
-                <line x1="4" y1="16" x2="12" y2="16" stroke="#10B981" strokeWidth="2"/>
-                <line x1="20" y1="16" x2="28" y2="16" stroke="#10B981" strokeWidth="2"/>
-              </svg>
+              <div className="w-4 h-4 rounded-full bg-[#10B981] border-2 border-white shadow-sm" />
               <span className="text-[#9CA3AF]">Rifle</span>
             </div>
             <div className="flex items-center gap-2">
-              <svg width="16" height="16" viewBox="0 0 32 32" className="flex-shrink-0">
-                <circle cx="16" cy="16" r="12" stroke="#F59E0B" strokeWidth="2" fill="none" opacity="0.4"/>
-                <circle cx="16" cy="16" r="4" stroke="#F59E0B" strokeWidth="2" fill="#F59E0B" opacity="0.6"/>
-                <line x1="16" y1="4" x2="16" y2="12" stroke="#F59E0B" strokeWidth="2"/>
-                <line x1="16" y1="20" x2="16" y2="28" stroke="#F59E0B" strokeWidth="2"/>
-                <line x1="4" y1="16" x2="12" y2="16" stroke="#F59E0B" strokeWidth="2"/>
-                <line x1="20" y1="16" x2="28" y2="16" stroke="#F59E0B" strokeWidth="2"/>
-              </svg>
+              <div className="w-4 h-4 rounded-full bg-[#F59E0B] border-2 border-white shadow-sm" />
               <span className="text-[#9CA3AF]">Shotgun</span>
             </div>
             <div className="flex items-center gap-2">
-              <svg width="16" height="16" viewBox="0 0 32 32" className="flex-shrink-0">
-                <circle cx="16" cy="16" r="12" stroke="#EF4444" strokeWidth="2" fill="none" opacity="0.4"/>
-                <circle cx="16" cy="16" r="4" stroke="#EF4444" strokeWidth="2" fill="#EF4444" opacity="0.6"/>
-                <line x1="16" y1="4" x2="16" y2="12" stroke="#EF4444" strokeWidth="2"/>
-                <line x1="16" y1="20" x2="16" y2="28" stroke="#EF4444" strokeWidth="2"/>
-                <line x1="4" y1="16" x2="12" y2="16" stroke="#EF4444" strokeWidth="2"/>
-                <line x1="20" y1="16" x2="28" y2="16" stroke="#EF4444" strokeWidth="2"/>
-              </svg>
+              <div className="w-4 h-4 rounded-full bg-[#EF4444] border-2 border-white shadow-sm" />
               <span className="text-[#9CA3AF]">Machine Gun</span>
             </div>
           </div>
