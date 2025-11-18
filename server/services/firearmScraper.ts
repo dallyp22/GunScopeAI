@@ -113,17 +113,17 @@ export class FirearmScraperService {
     // ============================================================
     // COMPETITOR AUCTION HOUSES - Major Firearms Marketplaces
     // ============================================================
-    { name: 'GunBroker.com', state: 'National', city: 'Online', url: 'https://www.gunbroker.com/', category: 'competitor' },
-    { name: 'GunAuction.com', state: 'National', city: 'Online', url: 'https://www.gunauction.com/', category: 'competitor' },
-    { name: 'GunsAmerica.com', state: 'National', city: 'Online', url: 'https://gunsamerica.com/', category: 'competitor' },
-    { name: 'GunSpot.com', state: 'National', city: 'Online', url: 'https://gunspot.com/', category: 'competitor' },
-    { name: 'Morphy Auctions', state: 'PA', city: 'Denver', url: 'https://morphyauctions.com/auctions/', category: 'competitor' },
-    { name: 'Summit Gun Auctions', state: 'National', city: 'Online', url: 'https://www.summitgunauctions.com/', category: 'competitor' },
-    { name: 'FirearmLand', state: 'National', city: 'Online', url: 'https://firearmland.com/', category: 'competitor' },
-    { name: 'Gun Runner Auctions', state: 'National', city: 'Online', url: 'https://www.gunrunnerauctions.com/', category: 'competitor' },
-    { name: 'SSL Firearms', state: 'National', city: 'Online', url: 'https://www.sslfirearms.com/', category: 'competitor' },
-    { name: 'CT Firearms Auctions', state: 'CT', city: 'Connecticut', url: 'https://ctfirearmsauction.com/', category: 'competitor' },
-    { name: 'Civilian Marksmanship Program (CMP)', state: 'National', city: 'Online', url: 'https://thecmp.org/cmp_sales/guns-on-auction/', category: 'competitor' }
+    { name: 'GunBroker.com', state: 'GA', city: 'Atlanta', url: 'https://www.gunbroker.com/', category: 'competitor', latitude: 33.7490, longitude: -84.3880 },
+    { name: 'GunAuction.com', state: 'FL', city: 'Tampa', url: 'https://www.gunauction.com/', category: 'competitor', latitude: 27.9506, longitude: -82.4572 },
+    { name: 'GunsAmerica.com', state: 'SD', city: 'Rapid City', url: 'https://gunsamerica.com/', category: 'competitor', latitude: 44.0805, longitude: -103.2310 },
+    { name: 'GunSpot.com', state: 'AZ', city: 'Phoenix', url: 'https://gunspot.com/', category: 'competitor', latitude: 33.4484, longitude: -112.0740 },
+    { name: 'Morphy Auctions', state: 'PA', city: 'Denver', url: 'https://morphyauctions.com/auctions/', category: 'competitor', latitude: 40.2338, longitude: -76.0869 },
+    { name: 'Summit Gun Auctions', state: 'OH', city: 'Columbus', url: 'https://www.summitgunauctions.com/', category: 'competitor', latitude: 39.9612, longitude: -82.9988 },
+    { name: 'FirearmLand', state: 'WA', city: 'Seattle', url: 'https://firearmland.com/', category: 'competitor', latitude: 47.6062, longitude: -122.3321 },
+    { name: 'Gun Runner Auctions', state: 'MD', city: 'Baltimore', url: 'https://www.gunrunnerauctions.com/', category: 'competitor', latitude: 39.2904, longitude: -76.6122 },
+    { name: 'SSL Firearms', state: 'NC', city: 'Charlotte', url: 'https://www.sslfirearms.com/', category: 'competitor', latitude: 35.2271, longitude: -80.8431 },
+    { name: 'CT Firearms Auctions', state: 'CT', city: 'Hartford', url: 'https://ctfirearmsauction.com/', category: 'competitor', latitude: 41.7658, longitude: -72.6734 },
+    { name: 'Civilian Marksmanship Program (CMP)', state: 'AL', city: 'Anniston', url: 'https://thecmp.org/cmp_sales/guns-on-auction/', category: 'competitor', latitude: 33.6598, longitude: -85.8316 }
   ];
 
   // Get stats from last scrape
@@ -149,6 +149,8 @@ export class FirearmScraperService {
       state: source.state,
       city: source.city,
       category: source.category,
+      latitude: (source as any).latitude || null,
+      longitude: (source as any).longitude || null,
       enabled: true
     }));
   }
