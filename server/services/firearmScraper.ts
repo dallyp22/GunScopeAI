@@ -1,4 +1,5 @@
 import { firecrawlService } from './firecrawl.js';
+import { firecrawlExtractService } from './firecrawlExtract.js';
 import { db } from '../db.js';
 import { firearmsAuctions } from '@shared/firearms-schema';
 import { eq } from 'drizzle-orm';
@@ -363,70 +364,45 @@ export class FirearmScraperService {
         return await this.scrapeTwoStage(source, stats, startTime);
       }
 
-      // Standard single-stage scrape
-      const response = await firecrawlService.scrape(source.url);
-
-      if (!response || !response.data) {
-        stats.failedScrapes = 1;
-        stats.duration = Date.now() - startTime;
-        this.lastScrapeStats.push(stats);
-        return [];
-      }
-
-      const content = response.data.markdown || response.data.html || '';
-      console.log(`Scraped ${source.name}, content length: ${content.length}`);
+      // Use Firecrawl Extract with intelligent caching
+      const extractResult = await firecrawlExtractService.extractFromAuctionSite(source);
       
-      const auctions: any[] = [];
+      const firearms = extractResult.firearms || [];
+      console.log(`  Extracted ${firearms.length} firearms from ${source.name}`);
       
-      // For initial testing, create a sample auction if we got content
-      if (content.length > 1000) {
-        auctions.push({
-          title: `Firearms from ${source.name}`,
-          url: source.url,
-          description: `Auction listing from ${source.name}`,
-          manufacturer: null,
-          model: null,
-          caliber: null,
-          category: null,
-          condition: null,
-          city: source.city,
-          state: source.state
-        });
-      }
+      stats.discoveredUrls = firearms.length;
+      stats.processedUrls = firearms.length;
 
-      stats.discoveredUrls = auctions.length;
-      stats.processedUrls = auctions.length;
-
-      // Save auctions to database
+      // Save firearms to database with deduplication
       const savedAuctions = [];
-      for (const auction of auctions) {
+      for (const firearm of firearms) {
         try {
-          // Check if auction already exists
+          // Deduplication check
           const existing = await db.select()
             .from(firearmsAuctions)
-            .where(eq(firearmsAuctions.url, auction.url))
+            .where(eq(firearmsAuctions.url, firearm.auctionUrl || firearm.url))
             .limit(1);
 
           if (existing.length === 0) {
-            // Insert new auction
+            // Insert new firearm auction
             const inserted = await db.insert(firearmsAuctions).values({
-              title: auction.title,
-              url: auction.url,
-              sourceWebsite: source.name,
-              description: auction.description || null,
-              manufacturer: auction.manufacturer || null,
-              model: auction.model || null,
-              caliber: auction.caliber || null,
-              category: auction.category || null,
-              condition: auction.condition || null,
-              lotNumber: auction.lot_number || null,
-              startingBid: auction.starting_bid || null,
-              currentBid: auction.current_bid || null,
-              estimateLow: auction.estimate_low || null,
-              estimateHigh: auction.estimate_high || null,
-              city: auction.city || source.city || null,
-              state: auction.state || source.state || null,
-              auctionDate: auction.auction_date ? new Date(auction.auction_date) : null,
+              title: firearm.title,
+              url: firearm.auctionUrl || source.url,
+              sourceWebsite: firearm.auctionHouse || source.name,
+              description: firearm.description || null,
+              manufacturer: firearm.manufacturer || null,
+              model: firearm.model || null,
+              caliber: firearm.caliber || null,
+              category: firearm.category || null,
+              condition: firearm.condition || null,
+              lotNumber: firearm.lotNumber || null,
+              currentBid: firearm.currentBid || null,
+              estimateLow: firearm.estimateLow || null,
+              estimateHigh: firearm.estimateHigh || null,
+              city: source.city || null,
+              state: source.state || null,
+              auctionDate: firearm.auctionDate ? new Date(firearm.auctionDate) : null,
+              auctionHouse: firearm.auctionHouse || source.name,
               enrichmentStatus: 'pending',
               status: 'active'
             }).returning();
@@ -439,21 +415,20 @@ export class FirearmScraperService {
               addToQueue(inserted[0].id);
             }
           } else {
-            // Update existing auction
-            await db.update(firearmsAuctions)
-              .set({
-                currentBid: auction.current_bid || existing[0].currentBid,
-                updatedAt: new Date()
-              })
-              .where(eq(firearmsAuctions.id, existing[0].id));
-            
-            savedAuctions.push(existing[0]);
-            stats.successfulSaves++;
+            // Update price if changed
+            if (firearm.currentBid && firearm.currentBid !== existing[0].currentBid) {
+              await db.update(firearmsAuctions)
+                .set({
+                  currentBid: firearm.currentBid,
+                  updatedAt: new Date()
+                })
+                .where(eq(firearmsAuctions.id, existing[0].id));
+            }
+            // Don't count as new save
           }
         } catch (saveError) {
-          console.error(`Failed to save auction: ${auction.url}`, saveError);
+          console.error(`Failed to save firearm:`, saveError);
           stats.failedSaves++;
-          stats.missingUrls.push(auction.url);
         }
       }
 

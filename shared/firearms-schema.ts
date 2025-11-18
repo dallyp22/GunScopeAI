@@ -205,3 +205,24 @@ export const auctionSources = pgTable("auction_sources", {
 export type AuctionSource = typeof auctionSources.$inferSelect;
 export type InsertAuctionSource = typeof auctionSources.$inferInsert;
 
+/**
+ * Scraping Cache - Store discovered URLs for efficiency
+ */
+export const scrapingCache = pgTable("scraping_cache", {
+  id: serial("id").primaryKey(),
+  sourceUrl: text("source_url").notNull().unique(),
+  sourceName: text("source_name").notNull(),
+  discoveredUrls: json("discovered_urls").$type<string[]>(),
+  lastScraped: timestamp("last_scraped").notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  auctionCount: integer("auction_count").default(0),
+  firearmsFound: integer("firearms_found").default(0),
+  createdAt: timestamp("created_at").defaultNow()
+}, (table) => ({
+  sourceUrlIdx: index("scraping_cache_url_idx").on(table.sourceUrl),
+  expiresIdx: index("scraping_cache_expires_idx").on(table.expiresAt),
+}));
+
+export type ScrapingCache = typeof scrapingCache.$inferSelect;
+export type InsertScrapingCache = typeof scrapingCache.$inferInsert;
+
