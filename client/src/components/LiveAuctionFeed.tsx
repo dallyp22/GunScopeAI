@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { formatDistanceToNow } from 'date-fns';
-import { Badge } from '@/components/ui/badge';
 
 interface FirearmAuction {
   id: number;
@@ -27,25 +26,12 @@ function AuctionCard({ auction }: { auction: FirearmAuction }) {
     switch (condition) {
       case 'NIB':
       case 'Excellent':
-        return 'text-[#00ff41]';
+        return 'text-[#10B981]';
       case 'Very Good':
       case 'Good':
-        return 'text-[#ffb000]';
+        return 'text-[#F59E0B]';
       default:
-        return 'text-[#00ff4166]';
-    }
-  };
-
-  const getRarityColor = (rarity: string | null) => {
-    switch (rarity) {
-      case 'Extremely Rare':
-        return 'text-[#ff0000]';
-      case 'Rare':
-        return 'text-[#ffb000]';
-      case 'Scarce':
-        return 'text-[#hud-blue]';
-      default:
-        return 'text-[#00ff4166]';
+        return 'text-[#6B7280]';
     }
   };
 
@@ -54,83 +40,82 @@ function AuctionCard({ auction }: { auction: FirearmAuction }) {
       href={auction.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="block border-b border-[#00ff4133] p-4 hover:bg-[#252a28] transition-colors cursor-pointer"
+      className="block p-4 rounded-lg bg-[#242832] border border-[#2a3040] hover:border-[#00D4FF] transition-all smooth-hover"
     >
       {/* Header */}
-      <div className="flex justify-between items-start mb-2">
+      <div className="flex justify-between items-start mb-3">
         <div className="flex-1">
-          <h4 className="text-sm text-[#00ff41] font-mono font-semibold">
+          <h4 className="text-sm font-semibold text-white mb-1 line-height-snug">
             {auction.manufacturer || 'Unknown'} {auction.model || 'Model'}
           </h4>
           {auction.caliber && (
-            <div className="text-xs text-[#00ff4166] font-mono mt-0.5">
+            <div className="text-xs text-[#9CA3AF]">
               {auction.caliber}
             </div>
           )}
         </div>
         {auction.lotNumber && (
-          <div className="text-[10px] text-[#00ff4133] font-mono">
-            LOT #{auction.lotNumber}
+          <div className="text-xs text-[#6B7280] ml-2">
+            #{auction.lotNumber}
           </div>
         )}
       </div>
 
       {/* Badges */}
-      <div className="flex gap-2 mb-2 flex-wrap">
+      <div className="flex gap-2 mb-3 flex-wrap">
         {auction.category && (
-          <span className="tactical-badge-green">
+          <span className="badge-primary text-xs">
             {auction.category}
           </span>
         )}
         {auction.condition && (
-          <span className={`text-[10px] font-mono ${getConditionColor(auction.condition)}`}>
+          <span className={`text-xs font-medium ${getConditionColor(auction.condition)}`}>
             {auction.condition}
           </span>
         )}
-        {auction.rarity && (
-          <span className={`text-[10px] font-mono ${getRarityColor(auction.rarity)}`}>
-            {auction.rarity}
-          </span>
-        )}
         {auction.nfaItem && (
-          <span className="tactical-badge-red">
+          <span className="badge-danger text-xs">
             NFA
           </span>
         )}
         {auction.isEstateSale && (
-          <span className="tactical-badge-amber">
-            ESTATE
+          <span className="badge-warning text-xs">
+            Estate
           </span>
         )}
       </div>
 
       {/* Pricing */}
-      <div className="flex justify-between items-end">
-        <div>
-          {auction.currentBid && (
-            <div className="text-sm text-[#00ff41] font-mono font-bold">
+      <div className="mb-3">
+        {auction.currentBid && (
+          <div className="flex justify-between items-center">
+            <span className="text-xs text-[#9CA3AF]">Current Bid</span>
+            <span className="text-base text-[#10B981] font-semibold data-value">
               ${auction.currentBid.toLocaleString()}
-            </div>
-          )}
-          {auction.estimateLow && auction.estimateHigh && (
-            <div className="text-[10px] text-[#00ff4166] font-mono">
-              Est: ${auction.estimateLow.toLocaleString()} - ${auction.estimateHigh.toLocaleString()}
-            </div>
-          )}
-        </div>
-        {auction.auctionDate && (
-          <div className="text-[10px] text-[#ffb000] font-mono">
-            {formatDistanceToNow(new Date(auction.auctionDate), { addSuffix: true })}
+            </span>
+          </div>
+        )}
+        {auction.estimateLow && auction.estimateHigh && (
+          <div className="flex justify-between items-center mt-1">
+            <span className="text-xs text-[#9CA3AF]">Estimate</span>
+            <span className="text-xs text-[#6B7280] data-value">
+              ${auction.estimateLow.toLocaleString()} - ${auction.estimateHigh.toLocaleString()}
+            </span>
           </div>
         )}
       </div>
 
-      {/* Auction house */}
-      {auction.auctionHouse && (
-        <div className="text-[10px] text-[#00ff4133] font-mono mt-2 uppercase">
-          {auction.auctionHouse}
-        </div>
-      )}
+      {/* Footer */}
+      <div className="flex justify-between items-center text-xs">
+        <span className="text-[#6B7280]">
+          {auction.auctionHouse || 'Unknown'}
+        </span>
+        {auction.auctionDate && (
+          <span className="text-[#F59E0B] font-medium">
+            {formatDistanceToNow(new Date(auction.auctionDate), { addSuffix: true })}
+          </span>
+        )}
+      </div>
     </a>
   );
 }
@@ -144,31 +129,31 @@ export function LiveAuctionFeed() {
       const data = await response.json();
       return data.auctions;
     },
-    refetchInterval: 30000 // 30 seconds
+    refetchInterval: 30000
   });
 
   return (
-    <div className="h-full tactical-border bg-[#1a1f1d] scanlines overflow-hidden flex flex-col">
+    <div className="modern-card h-full flex flex-col p-5">
       {/* Header */}
-      <div className="h-12 border-b border-[#00ff4133] px-4 flex items-center justify-between flex-shrink-0">
+      <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 bg-[#00ff41] rounded-full animate-pulse tactical-pulse" />
-          <span className="hud-text text-sm uppercase tracking-wider">
-            Live Feed - {auctions?.length || 0} Active
-          </span>
+          <div className="w-2 h-2 bg-[#10B981] rounded-full subtle-pulse" />
+          <h3 className="text-sm font-semibold text-white">
+            Live Feed
+          </h3>
         </div>
-        <div className="text-xs text-[#00ff4166] font-mono">
-          {new Date().toISOString().split('T')[0]}
+        <div className="text-xs text-[#00D4FF] font-medium">
+          {auctions?.length || 0} active
         </div>
       </div>
 
-      {/* Scrolling feed */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar">
+      {/* Auction Cards */}
+      <div className="flex-1 overflow-auto modern-scrollbar space-y-3">
         {!auctions || auctions.length === 0 ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
-              <div className="text-[#00ff4166] font-mono text-sm">No active auctions</div>
-              <div className="text-[#00ff4133] font-mono text-xs mt-2">
+              <div className="text-[#6B7280] text-sm mb-2">No active auctions</div>
+              <div className="text-[#6B7280] text-xs">
                 System monitoring...
               </div>
             </div>
@@ -180,18 +165,21 @@ export function LiveAuctionFeed() {
         )}
       </div>
 
-      {/* Footer stats */}
+      {/* Footer Stats */}
       {auctions && auctions.length > 0 && (
-        <div className="h-10 border-t border-[#00ff4133] px-4 flex items-center justify-between flex-shrink-0 bg-[#252a28]">
-          <div className="text-[10px] text-[#00ff4166] font-mono">
-            TOTAL ACTIVE: {auctions.length}
+        <div className="mt-4 pt-4 border-t border-[#374151]">
+          <div className="flex justify-between text-xs">
+            <span className="text-[#9CA3AF]">Total Active</span>
+            <span className="text-white font-medium">{auctions.length}</span>
           </div>
-          <div className="text-[10px] text-[#00ff41] font-mono">
-            LAST UPDATE: {formatDistanceToNow(new Date(), { addSuffix: true })}
+          <div className="flex justify-between text-xs mt-1">
+            <span className="text-[#9CA3AF]">Last Update</span>
+            <span className="text-[#00D4FF] font-medium">
+              {formatDistanceToNow(new Date(), { addSuffix: true })}
+            </span>
           </div>
         </div>
       )}
     </div>
   );
 }
-

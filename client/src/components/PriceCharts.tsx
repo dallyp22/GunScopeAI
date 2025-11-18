@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Area, AreaChart } from 'recharts';
 
 interface PriceTrend {
   date: string;
@@ -8,27 +9,31 @@ interface PriceTrend {
 }
 
 export function PriceCharts() {
+  const [timeRange, setTimeRange] = useState<number>(30);
+
   const { data: priceData } = useQuery<PriceTrend[]>({
-    queryKey: ['price-trends'],
+    queryKey: ['price-trends', timeRange],
     queryFn: async () => {
-      const response = await fetch('/api/intelligence/pricing/Handgun?days=30');
+      const response = await fetch(`/api/intelligence/pricing/Handgun?days=${timeRange}`);
       if (!response.ok) throw new Error('Failed to fetch price trends');
       const data = await response.json();
       return data.trends;
     },
-    refetchInterval: 300000 // 5 minutes
+    refetchInterval: 300000
   });
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-[#1a1f1d] border border-[#00ff4133] p-2 font-mono">
-          <div className="text-xs text-[#00ff4166]">{payload[0].payload.date}</div>
-          <div className="text-sm text-[#00ff41]">
+        <div className="frosted-glass border border-[#374151] p-3 rounded-lg">
+          <div className="text-xs text-[#9CA3AF] mb-1">
+            {new Date(payload[0].payload.date).toLocaleDateString()}
+          </div>
+          <div className="text-sm text-white font-semibold">
             ${payload[0].value.toLocaleString()}
           </div>
-          <div className="text-xs text-[#00ff4166]">
-            Vol: {payload[0].payload.volume}
+          <div className="text-xs text-[#6B7280] mt-1">
+            Volume: {payload[0].payload.volume}
           </div>
         </div>
       );
@@ -37,60 +42,86 @@ export function PriceCharts() {
   };
 
   return (
-    <div className="tactical-border bg-[#1a1f1d] p-4 scanlines">
-      <div className="flex items-center gap-2 mb-4">
-        <div className="w-2 h-2 bg-[#00ff41] rounded-full" />
-        <h3 className="hud-text text-sm uppercase tracking-wider">
-          Price Trends - 30D
+    <div className="modern-card h-full flex flex-col p-5">
+      {/* Header with Time Range Toggle */}
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-sm font-semibold text-white">
+          Price Trends
         </h3>
+        
+        {/* Time Range Pills */}
+        <div className="flex gap-1">
+          {[7, 30, 90].map((days) => (
+            <button
+              key={days}
+              onClick={() => setTimeRange(days)}
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                timeRange === days
+                  ? 'bg-[#00D4FF] text-white'
+                  : 'bg-[#2a3040] text-[#9CA3AF] hover:bg-[#374151]'
+              }`}
+            >
+              {days}D
+            </button>
+          ))}
+        </div>
       </div>
       
       {!priceData || priceData.length === 0 ? (
-        <div className="h-[200px] flex items-center justify-center">
-          <div className="text-[#00ff4166] font-mono text-xs">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-[#6B7280] text-sm">
             Insufficient data
           </div>
         </div>
       ) : (
-        <ResponsiveContainer width="100%" height={200}>
-          <LineChart data={priceData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(0, 255, 65, 0.1)" />
-            <XAxis 
-              dataKey="date" 
-              stroke="#00ff4166"
-              tick={{ fill: '#00ff41', fontSize: 10, fontFamily: 'Roboto Mono' }}
-              tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-            />
-            <YAxis 
-              stroke="#00ff4166"
-              tick={{ fill: '#00ff41', fontSize: 10, fontFamily: 'Roboto Mono' }}
-              tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
-            />
-            <Tooltip content={<CustomTooltip />} />
-            <Line 
-              type="monotone" 
-              dataKey="avgPrice" 
-              stroke="#00ff41" 
-              strokeWidth={2}
-              dot={false}
-              activeDot={{ r: 4, fill: '#00ff41', stroke: '#0a0f0d', strokeWidth: 2 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+        <div className="flex-1">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={priceData}>
+              <defs>
+                <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#00D4FF" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#00D4FF" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.3} />
+              <XAxis 
+                dataKey="date" 
+                stroke="#6B7280"
+                tick={{ fill: '#9CA3AF', fontSize: 11 }}
+                tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              />
+              <YAxis 
+                stroke="#6B7280"
+                tick={{ fill: '#9CA3AF', fontSize: 11 }}
+                tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Area
+                type="monotone"
+                dataKey="avgPrice"
+                stroke="#00D4FF"
+                strokeWidth={2}
+                fill="url(#priceGradient)"
+                dot={false}
+                activeDot={{ r: 4, fill: '#00D4FF', stroke: '#1a1d23', strokeWidth: 2 }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
       )}
 
-      {/* Summary stats */}
+      {/* Summary Stats */}
       {priceData && priceData.length > 0 && (
-        <div className="mt-4 grid grid-cols-2 gap-2 text-center">
-          <div className="border border-[#00ff4133] p-2">
-            <div className="text-[10px] text-[#00ff4166] font-mono">AVG PRICE</div>
-            <div className="text-sm text-[#00ff41] font-mono font-bold">
+        <div className="mt-4 grid grid-cols-2 gap-3">
+          <div className="text-center p-3 rounded-lg bg-[#2a3040]">
+            <div className="text-xs text-[#9CA3AF] mb-1">Avg Price</div>
+            <div className="text-lg text-white font-semibold data-value">
               ${(priceData.reduce((sum, d) => sum + d.avgPrice, 0) / priceData.length).toLocaleString(undefined, { maximumFractionDigits: 0 })}
             </div>
           </div>
-          <div className="border border-[#00ff4133] p-2">
-            <div className="text-[10px] text-[#00ff4166] font-mono">TOTAL VOL</div>
-            <div className="text-sm text-[#00ff41] font-mono font-bold">
+          <div className="text-center p-3 rounded-lg bg-[#2a3040]">
+            <div className="text-xs text-[#9CA3AF] mb-1">Total Volume</div>
+            <div className="text-lg text-white font-semibold data-value">
               {priceData.reduce((sum, d) => sum + d.volume, 0)}
             </div>
           </div>
@@ -99,4 +130,3 @@ export function PriceCharts() {
     </div>
   );
 }
-
