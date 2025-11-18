@@ -1523,10 +1523,11 @@ textarea {
 }
 
 /* Crosshair Markers - Smooth animations */
-.firearm-marker {
+.crosshair-marker {
   transition: transform 200ms ease-out, filter 200ms ease-out;
+  will-change: transform, filter;
 }
 
-.firearm-marker svg {
-  display: block;
+.crosshair-marker > div {
+  pointer-events: none;
 }

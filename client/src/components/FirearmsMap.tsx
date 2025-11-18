@@ -88,44 +88,95 @@ export function FirearmsMap() {
     markers.current.forEach(marker => marker.remove());
     markers.current = [];
 
-    // Add new markers with crosshair design
+    // Add new markers with CSS crosshair design
     auctions.forEach((auction) => {
       if (!auction.latitude || !auction.longitude) return;
 
-      // Create crosshair marker
-      const el = document.createElement('div');
-      el.className = 'firearm-marker';
-      el.style.width = '32px';
-      el.style.height = '32px';
-      el.style.cursor = 'pointer';
-      el.style.position = 'relative';
-      
       // Determine color by category
       let color = '#9ca3af';
       if (auction.category === 'Handgun') color = '#00D4FF';
       else if (auction.category === 'Rifle') color = '#10B981';
       else if (auction.category === 'Shotgun') color = '#F59E0B';
       else if (auction.category === 'Machine Gun') color = '#EF4444';
+
+      // Create crosshair marker using CSS
+      const el = document.createElement('div');
+      el.className = 'crosshair-marker';
+      el.style.width = '32px';
+      el.style.height = '32px';
+      el.style.position = 'relative';
+      el.style.cursor = 'pointer';
       
-      // Create crosshair SVG
-      el.innerHTML = `
-        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- Outer ring -->
-          <circle cx="16" cy="16" r="12" stroke="${color}" stroke-width="2" fill="none" opacity="0.4"/>
-          <!-- Inner circle -->
-          <circle cx="16" cy="16" r="4" stroke="${color}" stroke-width="2" fill="${color}" opacity="0.6"/>
-          <!-- Crosshair lines -->
-          <line x1="16" y1="4" x2="16" y2="12" stroke="${color}" stroke-width="2"/>
-          <line x1="16" y1="20" x2="16" y2="28" stroke="${color}" stroke-width="2"/>
-          <line x1="4" y1="16" x2="12" y2="16" stroke="${color}" stroke-width="2"/>
-          <line x1="20" y1="16" x2="28" y2="16" stroke="${color}" stroke-width="2"/>
-        </svg>
-      `;
+      // Outer ring
+      const outerRing = document.createElement('div');
+      outerRing.style.position = 'absolute';
+      outerRing.style.width = '24px';
+      outerRing.style.height = '24px';
+      outerRing.style.borderRadius = '50%';
+      outerRing.style.border = `2px solid ${color}`;
+      outerRing.style.opacity = '0.4';
+      outerRing.style.top = '4px';
+      outerRing.style.left = '4px';
+      
+      // Inner dot
+      const innerDot = document.createElement('div');
+      innerDot.style.position = 'absolute';
+      innerDot.style.width = '8px';
+      innerDot.style.height = '8px';
+      innerDot.style.borderRadius = '50%';
+      innerDot.style.backgroundColor = color;
+      innerDot.style.border = `1px solid ${color}`;
+      innerDot.style.top = '12px';
+      innerDot.style.left = '12px';
+      
+      // Vertical line top
+      const vLineTop = document.createElement('div');
+      vLineTop.style.position = 'absolute';
+      vLineTop.style.width = '2px';
+      vLineTop.style.height = '8px';
+      vLineTop.style.backgroundColor = color;
+      vLineTop.style.top = '0';
+      vLineTop.style.left = '15px';
+      
+      // Vertical line bottom
+      const vLineBottom = document.createElement('div');
+      vLineBottom.style.position = 'absolute';
+      vLineBottom.style.width = '2px';
+      vLineBottom.style.height = '8px';
+      vLineBottom.style.backgroundColor = color;
+      vLineBottom.style.bottom = '0';
+      vLineBottom.style.left = '15px';
+      
+      // Horizontal line left
+      const hLineLeft = document.createElement('div');
+      hLineLeft.style.position = 'absolute';
+      hLineLeft.style.width = '8px';
+      hLineLeft.style.height = '2px';
+      hLineLeft.style.backgroundColor = color;
+      hLineLeft.style.top = '15px';
+      hLineLeft.style.left = '0';
+      
+      // Horizontal line right
+      const hLineRight = document.createElement('div');
+      hLineRight.style.position = 'absolute';
+      hLineRight.style.width = '8px';
+      hLineRight.style.height = '2px';
+      hLineRight.style.backgroundColor = color;
+      hLineRight.style.top = '15px';
+      hLineRight.style.right = '0';
+      
+      // Assemble crosshair
+      el.appendChild(outerRing);
+      el.appendChild(innerDot);
+      el.appendChild(vLineTop);
+      el.appendChild(vLineBottom);
+      el.appendChild(hLineLeft);
+      el.appendChild(hLineRight);
       
       // Hover effect
       el.addEventListener('mouseenter', () => {
-        el.style.transform = 'scale(1.2)';
-        el.style.filter = `drop-shadow(0 0 8px ${color})`;
+        el.style.transform = 'scale(1.3)';
+        el.style.filter = `drop-shadow(0 0 6px ${color})`;
       });
       
       el.addEventListener('mouseleave', () => {
