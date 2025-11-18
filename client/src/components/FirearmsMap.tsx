@@ -161,18 +161,49 @@ export function FirearmsMap() {
         el.style.cursor = 'pointer';
         el.style.boxShadow = '0 3px 10px rgba(0,0,0,0.4)';
         
-        // Add popup on click
+        // Add enhanced popup on click
         el.addEventListener('click', (e) => {
           e.stopPropagation();
           e.preventDefault();
           
-          new maplibregl.Popup({ closeButton: true, closeOnClick: true })
+          new maplibregl.Popup({ 
+            closeButton: true, 
+            closeOnClick: true,
+            maxWidth: '320px',
+            className: 'competitor-popup'
+          })
             .setLngLat([source.longitude, source.latitude])
             .setHTML(`
-              <div class="p-3">
-                <div class="font-semibold text-sm mb-1">${source.name}</div>
-                <div class="text-xs text-gray-600 mb-2">${source.city}, ${source.state}</div>
-                <a href="${source.url}" target="_blank" class="text-xs text-blue-500 hover:underline">Visit Site →</a>
+              <div class="p-4 bg-[#1a1d23]">
+                <div class="flex items-start gap-3 mb-3">
+                  <div class="w-10 h-10 rounded-full bg-[#A855F7] flex items-center justify-center flex-shrink-0">
+                    <span class="text-white text-lg">🎯</span>
+                  </div>
+                  <div class="flex-1">
+                    <div class="font-semibold text-white text-sm mb-1">${source.name}</div>
+                    <div class="text-xs text-[#9CA3AF]">${source.city}, ${source.state}</div>
+                  </div>
+                </div>
+                
+                <div class="space-y-2 mb-3">
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="text-[#6B7280]">Category</span>
+                    <span class="text-[#00D4FF] font-medium">Competitor Marketplace</span>
+                  </div>
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="text-[#6B7280]">Status</span>
+                    <span class="text-[#10B981] font-medium">● Active</span>
+                  </div>
+                </div>
+                
+                <a 
+                  href="${source.url}" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  class="block w-full text-center py-2 px-4 rounded-lg bg-[#00D4FF] text-white text-sm font-medium hover:bg-[#00B8E6] transition-colors"
+                >
+                  Visit Auction House →
+                </a>
               </div>
             `)
             .addTo(map.current!);
